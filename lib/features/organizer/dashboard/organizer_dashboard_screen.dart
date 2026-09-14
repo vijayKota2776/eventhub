@@ -65,7 +65,21 @@ class _OrganizerDashboardScreenState extends ConsumerState<OrganizerDashboardScr
               return ListTile(
                 title: Text(event.title),
                 subtitle: Text(event.status),
-                trailing: Text('${event.totalSold} sold'),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.analytics, color: Colors.blue),
+                      tooltip: 'Analytics',
+                      onPressed: () => context.push('/organizer/event/${event.id}/analytics'),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.confirmation_num, color: Colors.green),
+                      tooltip: 'Tickets',
+                      onPressed: () => context.push('/organizer/event/${event.id}/tickets'),
+                    ),
+                  ],
+                ),
                 onTap: () {
                   context.push('/organizer/event/${event.id}/tickets');
                 },
@@ -73,7 +87,7 @@ class _OrganizerDashboardScreenState extends ConsumerState<OrganizerDashboardScr
             },
           );
         },
-      ) : _currentIndex == 2 ? const ScannerScreen() : const Center(child: Text('Coming soon')),
+      ) : _currentIndex == 1 ? const ScannerScreen() : const SizedBox(),
       floatingActionButton: _currentIndex == 0 ? FloatingActionButton(
         onPressed: () => context.push('/organizer/create_event'),
         child: const Icon(Icons.add),
@@ -89,10 +103,6 @@ class _OrganizerDashboardScreenState extends ConsumerState<OrganizerDashboardScr
           NavigationDestination(
             icon: Icon(Icons.event),
             label: 'Events',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.analytics),
-            label: 'Analytics',
           ),
           NavigationDestination(
             icon: Icon(Icons.qr_code_scanner),

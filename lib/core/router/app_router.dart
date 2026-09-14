@@ -14,6 +14,7 @@ import 'package:eventhub/features/organizer/dashboard/organizer_dashboard_screen
 import 'package:eventhub/features/organizer/create_event/create_event_screen.dart';
 import 'package:eventhub/features/organizer/ticket_tiers/ticket_tiers_screen.dart';
 import 'package:eventhub/features/admin/dashboard/admin_dashboard_screen.dart';
+import 'package:eventhub/features/organizer/analytics/analytics_screen.dart';
 
 part 'app_router.g.dart';
 
@@ -112,6 +113,20 @@ GoRouter router(Ref ref) {
         builder: (context, state) {
           final eventId = state.pathParameters['id']!;
           return TicketTiersScreen(eventId: eventId);
+        },
+      ),
+      GoRoute(
+        path: '/organizer/event/:id/analytics',
+        builder: (context, state) {
+          final eventId = state.pathParameters['id']!;
+          return AnalyticsScreen(eventId: eventId);
+        },
+      ),
+      GoRoute(
+        path: '/organizer/event/:id/analytics',
+        builder: (context, state) {
+          final eventId = state.pathParameters['id']!;
+          return AnalyticsScreen(eventId: eventId);
         },
       ),
       GoRoute(

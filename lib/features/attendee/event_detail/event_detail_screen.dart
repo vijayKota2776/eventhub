@@ -110,7 +110,7 @@ class EventDetailScreen extends ConsumerWidget {
                 padding: const EdgeInsets.all(16.0),
                 child: ElevatedButton(
                   onPressed: () {
-                    context.push('/attendee/event/${event.id}/checkout');
+                    context.push('/attendee/event/$eventId/checkout');
                   },
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
