@@ -67,6 +67,21 @@ class AuthRepository {
   Future<void> signOut() async {
     await _client.auth.signOut();
   }
+
+  Future<List<AppUser>> getAllUsers() async {
+    final response = await _client
+        .from('users')
+        .select()
+        .order('created_at', ascending: false);
+    return (response as List).map((u) => AppUser.fromJson(u)).toList();
+  }
+
+  Future<void> updateUserRole(String userId, UserRole newRole) async {
+    await _client
+        .from('users')
+        .update({'role': newRole.name})
+        .eq('id', userId);
+  }
 }
 
 @riverpod

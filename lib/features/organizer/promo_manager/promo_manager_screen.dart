@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:eventhub/providers/auth_provider.dart';
 import 'package:eventhub/repositories/event_repository.dart';
 import 'package:eventhub/repositories/booking_repository.dart';
-import 'package:eventhub/models/event.dart';
-import 'package:go_router/go_router.dart';
 
 // Refund request model (minimal, inline)
 class RefundRequest {
@@ -230,7 +227,9 @@ class _RefundsTabState extends ConsumerState<_RefundsTab> {
   Future<void> _update(String refundId, String status) async {
     await ref.read(bookingRepositoryProvider).updateRefundStatus(refundId, status);
     _load();
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Refund $status')));
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Refund $status')));
+    }
   }
 
   @override
@@ -258,7 +257,7 @@ class _RefundsTabState extends ConsumerState<_RefundsTab> {
                 Text('Booking #${r.bookingId.substring(0, 8)}', style: const TextStyle(fontWeight: FontWeight.bold)),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                  decoration: BoxDecoration(color: statusColor.withOpacity(0.15), borderRadius: BorderRadius.circular(8)),
+                  decoration: BoxDecoration(color: statusColor.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(8)),
                   child: Text(r.status.toUpperCase(), style: TextStyle(color: statusColor, fontSize: 11, fontWeight: FontWeight.bold)),
                 ),
               ]),

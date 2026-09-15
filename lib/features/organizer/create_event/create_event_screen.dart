@@ -87,8 +87,11 @@ class _CreateEventScreenState extends ConsumerState<CreateEventScreen> {
     );
 
     setState(() {
-      if (isStart) _startAt = dateTime;
-      else _endAt = dateTime;
+      if (isStart) {
+        _startAt = dateTime;
+      } else {
+        _endAt = dateTime;
+      }
     });
   }
 

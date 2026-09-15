@@ -13,7 +13,7 @@ class MyTicketsScreen extends ConsumerStatefulWidget {
 }
 
 class _MyTicketsScreenState extends ConsumerState<MyTicketsScreen> {
-  Future<void> _requestRefund(BuildContext context, Booking booking) async {
+  Future<void> _requestRefund(Booking booking) async {
     final reason = await showDialog<String>(
       context: context,
       builder: (ctx) {
@@ -69,10 +69,26 @@ class _MyTicketsScreenState extends ConsumerState<MyTicketsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final user = ref.read(authControllerProvider).value!;
+    final user = ref.watch(authControllerProvider).value;
+
+    if (user == null) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('My Tickets')),
+      appBar: AppBar(
+        title: const Text('My Tickets'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () {
+              ref.read(authControllerProvider.notifier).signOut();
+            },
+          ),
+        ],
+      ),
       body: FutureBuilder<List<Booking>>(
         future: ref.read(bookingRepositoryProvider).getMyBookings(user.id),
         builder: (context, snapshot) {
@@ -84,8 +100,23 @@ class _MyTicketsScreenState extends ConsumerState<MyTicketsScreen> {
           }
 
           final bookings = snapshot.data ?? [];
+
           if (bookings.isEmpty) {
-            return const Center(child: Text('You have no tickets.'));
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.confirmation_number_outlined, size: 64, color: Colors.grey),
+                  const SizedBox(height: 16),
+                  const Text('No tickets booked yet.', style: TextStyle(fontSize: 16)),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () => context.go('/attendee/browse'),
+                    child: const Text('Browse Events'),
+                  ),
+                ],
+              ),
+            );
           }
 
           return ListView.builder(
@@ -115,7 +146,7 @@ class _MyTicketsScreenState extends ConsumerState<MyTicketsScreen> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                           decoration: BoxDecoration(
-                            color: statusColor.withOpacity(0.15),
+                            color: statusColor.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(b.status.toUpperCase(),
@@ -132,20 +163,19 @@ class _MyTicketsScreenState extends ConsumerState<MyTicketsScreen> {
                         IconButton(
                           icon: const Icon(Icons.money_off, color: Colors.orange),
                           tooltip: 'Request Refund',
-                          onPressed: () => _requestRefund(context, b),
+                          onPressed: () => _requestRefund(b),
                         ),
+                      IconButton(
+                        icon: const Icon(Icons.star_outline, color: Colors.amber),
+                        tooltip: 'Rate Event',
+                        onPressed: () => context.push('/attendee/event/${b.eventId}'),
+                      ),
                       const Icon(Icons.chevron_right),
                     ],
                   ),
                   isThreeLine: true,
                   onTap: () {
-                    if (b.status == 'confirmed' || b.status == 'pending_payment') {
-                      context.push('/attendee/ticket_qr', extra: b);
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('No QR available for this ticket.')),
-                      );
-                    }
+                    context.push('/attendee/ticket_qr', extra: b);
                   },
                 ),
               );

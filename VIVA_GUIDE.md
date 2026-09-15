@@ -257,17 +257,29 @@ The `ref.watch()` creates a reactive subscription — whenever the underlying da
 - [x] Refund Workflow: Attendees request refunds; Organizers approve/reject
 - [x] Email Confirmations: Supabase Edge Function sends HTML booking confirmation emails
 
+### v1.2 — Full Completion ✅
+- [x] **Admin Event Approvals**: Full review workflow to Approve or Reject submitted events
+- [x] **Admin Platform Stats**: Real-time KPI dashboard (Total Users, Events, Bookings, Platform Revenue)
+- [x] **Admin User Management**: Search users and promote/demote roles (Attendee / Organizer / Admin)
+- [x] **Reviews & Ratings**: Attendees leave 1-5 star ratings & comments; average score on event header
+- [x] **Organizer Attendee Roster**: Complete attendee table with check-in badges and one-tap CSV Export
+- [x] **Interactive Payment Gateway**: Simulated checkout sheet (UPI, Cards, Net Banking) with secure processing
+- [x] **Offline Scanner Sync**: Pre-cache ticket tokens for offline scanning at venues + automatic cloud sync
+- [x] **Zero-Warning Code Quality**: Flutter analyze passes with 0 errors and 0 warnings, automated unit tests
+
 ---
 
 ## 10. What is Left (Roadmap)
 
-### v1.2 — Enhanced Experience
+### Future Enhancements (v1.3+)
 | Feature | Description | Complexity |
 |---|---|---|
 | 🪑 Seat Selection | Visual seat map UI (like BookMyShow). Users pick specific seats | High |
 | 👥 Group Bookings | Book for multiple attendees with individual QR codes per person | Medium |
 | 💱 Multi-Currency | Support INR, USD, EUR etc. using currency detection | Low |
 | 💸 Organizer Payouts | Scheduled payout to organizer's bank account after event | High |
+| 🔔 Push Notifications | FCM notifications for event reminders, booking updates, waitlist alerts | Medium |
+| 📅 Calendar Integration | Add event to Google/Apple Calendar | Low |
 
 ### v1.3 — Platform Growth
 | Feature | Description | Complexity |

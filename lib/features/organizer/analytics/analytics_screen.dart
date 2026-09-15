@@ -79,7 +79,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                           PieChartSectionData(
                             color: Colors.grey.shade400,
                             value: nonAttended.toDouble(),
-                            title: '${nonAttended}\nAbsent',
+                            title: '$nonAttended\nAbsent',
                             radius: 100,
                             titleStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black87),
                           ),

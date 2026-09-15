@@ -63,7 +63,7 @@ class BrowseScreen extends ConsumerWidget {
             child: ListView.separated(
               padding: const EdgeInsets.all(16),
               itemCount: events.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 16),
+              separatorBuilder: (_, _) => const SizedBox(height: 16),
               itemBuilder: (context, index) {
                 return _EventCard(event: events[index]);
               },
@@ -100,7 +100,7 @@ class _EventCard extends StatelessWidget {
                   ? Image.network(
                       event.bannerUrl!,
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => _buildPlaceholder(colorScheme),
+                      errorBuilder: (_, _, _) => _buildPlaceholder(colorScheme),
                     )
                   : _buildPlaceholder(colorScheme),
             ),

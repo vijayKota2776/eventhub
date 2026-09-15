@@ -17,6 +17,8 @@ import 'package:eventhub/features/organizer/analytics/analytics_screen.dart';
 import 'package:eventhub/features/organizer/promo_manager/promo_manager_screen.dart';
 import 'package:eventhub/features/admin/dashboard/admin_dashboard_screen.dart';
 
+import 'package:eventhub/features/organizer/attendees/attendees_screen.dart';
+
 part 'app_router.g.dart';
 
 class RouterNotifier extends ChangeNotifier {
@@ -54,25 +56,26 @@ GoRouter router(Ref ref) {
       return null;
     },
     routes: [
-      GoRoute(path: '/', builder: (_, __) => const Scaffold(body: Center(child: CircularProgressIndicator()))),
-      GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
+      GoRoute(path: '/', builder: (_, _) => const Scaffold(body: Center(child: CircularProgressIndicator()))),
+      GoRoute(path: '/login', builder: (_, _) => const LoginScreen()),
 
       // ── Attendee ───────────────────────────────────────────────
-      GoRoute(path: '/attendee/browse', builder: (_, __) => const BrowseScreen()),
-      GoRoute(path: '/attendee/my_tickets', builder: (_, __) => const MyTicketsScreen()),
+      GoRoute(path: '/attendee/browse', builder: (_, _) => const BrowseScreen()),
+      GoRoute(path: '/attendee/my_tickets', builder: (_, _) => const MyTicketsScreen()),
       GoRoute(path: '/attendee/ticket_qr', builder: (_, state) => TicketQrScreen(booking: state.extra as Booking)),
       GoRoute(path: '/attendee/event/:id', builder: (_, state) => EventDetailScreen(eventId: state.pathParameters['id']!)),
       GoRoute(path: '/attendee/event/:id/checkout', builder: (_, state) => CheckoutScreen(eventId: state.pathParameters['id']!)),
 
       // ── Organizer ──────────────────────────────────────────────
-      GoRoute(path: '/organizer/dashboard', builder: (_, __) => const OrganizerDashboardScreen()),
-      GoRoute(path: '/organizer/create_event', builder: (_, __) => const CreateEventScreen()),
+      GoRoute(path: '/organizer/dashboard', builder: (_, _) => const OrganizerDashboardScreen()),
+      GoRoute(path: '/organizer/create_event', builder: (_, _) => const CreateEventScreen()),
       GoRoute(path: '/organizer/event/:id/tickets', builder: (_, state) => TicketTiersScreen(eventId: state.pathParameters['id']!)),
       GoRoute(path: '/organizer/event/:id/analytics', builder: (_, state) => AnalyticsScreen(eventId: state.pathParameters['id']!)),
       GoRoute(path: '/organizer/event/:id/promo', builder: (_, state) => PromoManagerScreen(eventId: state.pathParameters['id']!)),
+      GoRoute(path: '/organizer/event/:id/attendees', builder: (_, state) => AttendeesScreen(eventId: state.pathParameters['id']!)),
 
       // ── Admin ──────────────────────────────────────────────────
-      GoRoute(path: '/admin/dashboard', builder: (_, __) => const AdminDashboardScreen()),
+      GoRoute(path: '/admin/dashboard', builder: (_, _) => const AdminDashboardScreen()),
     ],
   );
 }

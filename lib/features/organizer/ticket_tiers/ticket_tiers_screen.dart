@@ -17,8 +17,8 @@ class _TicketTiersScreenState extends ConsumerState<TicketTiersScreen> {
     final nameController = TextEditingController();
     final priceController = TextEditingController();
     final quantityController = TextEditingController();
-    DateTime? salesStart = DateTime.now();
-    DateTime? salesEnd = DateTime.now().add(const Duration(days: 30));
+    final salesStart = DateTime.now();
+    final salesEnd = DateTime.now().add(const Duration(days: 30));
 
     await showDialog(
       context: context,
@@ -63,8 +63,8 @@ class _TicketTiersScreenState extends ConsumerState<TicketTiersScreen> {
                   name: nameController.text,
                   price: price,
                   quantityTotal: qty,
-                  salesStart: salesStart!,
-                  salesEnd: salesEnd!,
+                  salesStart: salesStart,
+                  salesEnd: salesEnd,
                 );
 
                 try {

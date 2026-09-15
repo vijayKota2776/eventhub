@@ -91,11 +91,68 @@ class EventRepository {
     await _client.from('promo_codes').insert({
       'event_id': eventId,
       'code': code,
-      if (discountAmount != null) 'discount_amount': discountAmount,
-      if (discountPercent != null) 'discount_percent': discountPercent,
-      if (maxUses != null) 'max_uses': maxUses,
-      if (validUntil != null) 'valid_until': validUntil.toIso8601String(),
+      'discount_amount': ?discountAmount,
+      'discount_percent': ?discountPercent,
+      'max_uses': ?maxUses,
+      'valid_until': ?validUntil?.toIso8601String(),
     });
+  }
+
+  // Admin Approvals
+  Future<List<Event>> getPendingEvents() async {
+    final response = await _client
+        .from('events')
+        .select()
+        .neq('status', 'published')
+        .order('created_at', ascending: false);
+    return (response as List).map((e) => Event.fromJson(e)).toList();
+  }
+
+  Future<void> updateEventStatus(String eventId, String status) async {
+    await _client
+        .from('events')
+        .update({'status': status})
+        .eq('id', eventId);
+  }
+
+  // Organizer Attendee Roster
+  Future<List<Map<String, dynamic>>> getEventAttendees(String eventId) async {
+    final response = await _client
+        .from('bookings')
+        .select('id, quantity, total_amount, status, created_at, users(name, email), ticket_types(name)')
+        .eq('event_id', eventId)
+        .order('created_at', ascending: false);
+    return (response as List).cast<Map<String, dynamic>>();
+  }
+
+  // Reviews & Ratings
+  Future<List<Map<String, dynamic>>> getEventReviews(String eventId) async {
+    try {
+      final response = await _client
+          .from('reviews')
+          .select()
+          .eq('event_id', eventId)
+          .order('created_at', ascending: false);
+      return (response as List).cast<Map<String, dynamic>>();
+    } catch (_) {
+      return [];
+    }
+  }
+
+  Future<void> submitReview({
+    required String eventId,
+    required String userId,
+    required String userName,
+    required int rating,
+    String? comment,
+  }) async {
+    await _client.from('reviews').upsert({
+      'event_id': eventId,
+      'user_id': userId,
+      'user_name': userName,
+      'rating': rating,
+      'comment': ?comment,
+    }, onConflict: 'event_id,user_id');
   }
 }
 
