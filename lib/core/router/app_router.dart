@@ -18,6 +18,11 @@ import 'package:eventhub/features/organizer/promo_manager/promo_manager_screen.d
 import 'package:eventhub/features/admin/dashboard/admin_dashboard_screen.dart';
 import 'package:eventhub/features/organizer/attendees/attendees_screen.dart';
 import 'package:eventhub/features/attendee/seat_selection/seat_selection_screen.dart';
+import 'package:eventhub/features/attendee/group_booking/group_booking_screen.dart';
+import 'package:eventhub/features/attendee/group_booking/group_ticket_list_screen.dart';
+import 'package:eventhub/features/attendee/notifications/notification_settings_screen.dart';
+import 'package:eventhub/features/organizer/payouts/payout_dashboard_screen.dart';
+import 'package:eventhub/core/providers/currency_provider.dart';
 
 part 'app_router.g.dart';
 
@@ -69,6 +74,29 @@ GoRouter router(Ref ref) {
         eventId: state.pathParameters['id']!,
         selectedSeats: (state.extra as Map<String, dynamic>?)?['selectedSeats'] as List<String>?,
       )),
+      GoRoute(
+        path: '/attendee/event/:id/group_booking',
+        builder: (_, state) => GroupBookingScreen(eventId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: '/attendee/event/:id/group_tickets',
+        builder: (_, state) {
+          final extra = state.extra as Map<String, dynamic>;
+          return GroupTicketListScreen(
+            bookingIds: List<String>.from(extra['bookingIds'] as List),
+            attendees: (extra['attendees'] as List)
+                .map((a) => Map<String, String>.from(a as Map))
+                .toList(),
+            tierName: extra['tierName'] as String,
+            totalPrice: (extra['totalPrice'] as num).toDouble(),
+            currency: extra['currency'] as AppCurrency,
+          );
+        },
+      ),
+      GoRoute(
+        path: '/attendee/notification_settings',
+        builder: (_, _) => const NotificationSettingsScreen(),
+      ),
 
       // ── Organizer ──────────────────────────────────────────────
       GoRoute(path: '/organizer/dashboard', builder: (_, _) => const OrganizerDashboardScreen()),
@@ -77,6 +105,7 @@ GoRouter router(Ref ref) {
       GoRoute(path: '/organizer/event/:id/analytics', builder: (_, state) => AnalyticsScreen(eventId: state.pathParameters['id']!)),
       GoRoute(path: '/organizer/event/:id/promo', builder: (_, state) => PromoManagerScreen(eventId: state.pathParameters['id']!)),
       GoRoute(path: '/organizer/event/:id/attendees', builder: (_, state) => AttendeesScreen(eventId: state.pathParameters['id']!)),
+      GoRoute(path: '/organizer/payouts', builder: (_, _) => const PayoutDashboardScreen()),
 
       // ── Admin ──────────────────────────────────────────────────
       GoRoute(path: '/admin/dashboard', builder: (_, _) => const AdminDashboardScreen()),

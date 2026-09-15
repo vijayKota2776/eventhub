@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'package:eventhub/core/api/supabase_client.dart';
 import 'package:eventhub/models/event.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -153,6 +154,20 @@ class EventRepository {
       'rating': rating,
       'comment': ?comment,
     }, onConflict: 'event_id,user_id');
+  }
+
+  /// Uploads banner image bytes to Supabase Storage and returns the public URL.
+  Future<String> uploadBannerImage({
+    required String organizerId,
+    required Uint8List bytes,
+    required String extension,
+  }) async {
+    final path = 'banners/$organizerId/${DateTime.now().millisecondsSinceEpoch}.$extension';
+    await _client.storage
+        .from('event-banners')
+        .uploadBinary(path, bytes,
+            fileOptions: FileOptions(contentType: 'image/$extension', upsert: true));
+    return _client.storage.from('event-banners').getPublicUrl(path);
   }
 }
 
