@@ -9,12 +9,21 @@ class AuthController extends _$AuthController {
   @override
   FutureOr<AppUser?> build() async {
     final authRepo = ref.watch(authRepositoryProvider);
-
-    // Initial load
     final user = authRepo.currentUser;
     if (user == null) return null;
 
-    return await authRepo.getAppUser(user.id);
+    final appUser = await authRepo.getAppUser(user.id);
+    return appUser ??
+        AppUser(
+          id: user.id,
+          email: user.email ?? '',
+          name: user.userMetadata?['name'] ?? 'User',
+          role: user.userMetadata?['role'] == 'organizer'
+              ? UserRole.organizer
+              : user.userMetadata?['role'] == 'admin'
+                  ? UserRole.admin
+                  : UserRole.attendee,
+        );
   }
 
   Future<void> signIn(String email, String password) async {
@@ -28,15 +37,16 @@ class AuthController extends _$AuthController {
     }
   }
 
-  Future<void> signUp(String email, String password, String name, UserRole role) async {
+  Future<void> signUp(
+      String email, String password, String name, UserRole role) async {
     state = const AsyncValue.loading();
     try {
       await ref.read(authRepositoryProvider).signUp(
-        email: email,
-        password: password,
-        name: name,
-        role: role,
-      );
+            email: email,
+            password: password,
+            name: name,
+            role: role,
+          );
       ref.invalidateSelf();
     } catch (e, st) {
       state = AsyncValue.error(e, st);

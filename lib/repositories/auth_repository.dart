@@ -38,7 +38,6 @@ class AuthRepository {
     required String name,
     required UserRole role,
   }) async {
-    // Supabase Auth signup
     final response = await _client.auth.signUp(
       email: email,
       password: password,
@@ -47,9 +46,7 @@ class AuthRepository {
         'role': role.name,
       },
     );
-    
-    // Fallback: If no Postgres trigger exists to create the user row, we create it here.
-    // If a trigger exists, this might fail with a unique constraint violation, which we can ignore.
+
     if (response.user != null) {
       try {
         await _client.from('users').upsert({
@@ -58,9 +55,7 @@ class AuthRepository {
           'name': name,
           'role': role.name,
         });
-      } catch (_) {
-        // Ignore upsert error assuming trigger handled it
-      }
+      } catch (_) {}
     }
   }
 

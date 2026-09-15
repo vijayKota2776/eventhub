@@ -1,10 +1,9 @@
 import 'dart:typed_data';
 import 'package:eventhub/core/api/supabase_client.dart';
 import 'package:eventhub/models/event.dart';
+import 'package:eventhub/models/ticket_type.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
-import 'package:eventhub/models/ticket_type.dart';
 
 part 'event_repository.g.dart';
 
@@ -19,17 +18,13 @@ class EventRepository {
         .select()
         .eq('status', 'published')
         .order('start_at', ascending: true);
-        
+
     return (response as List).map((e) => Event.fromJson(e)).toList();
   }
 
   Future<Event> getEventDetails(String id) async {
-    final response = await _client
-        .from('events')
-        .select()
-        .eq('id', id)
-        .single();
-        
+    final response =
+        await _client.from('events').select().eq('id', id).single();
     return Event.fromJson(response);
   }
 
@@ -39,17 +34,21 @@ class EventRepository {
         .select()
         .eq('organizer_id', organizerId)
         .order('created_at', ascending: false);
-        
+
     return (response as List).map((e) => Event.fromJson(e)).toList();
   }
 
   Future<Event> createEvent(Event event) async {
     final response = await _client
         .from('events')
-        .insert(event.toJson()..remove('id')..remove('created_at')..remove('total_sold')..remove('gross_revenue'))
+        .insert(event.toJson()
+          ..remove('id')
+          ..remove('created_at')
+          ..remove('total_sold')
+          ..remove('gross_revenue'))
         .select()
         .single();
-        
+
     return Event.fromJson(response);
   }
 
@@ -59,7 +58,7 @@ class EventRepository {
         .select()
         .eq('event_id', eventId)
         .order('price', ascending: true);
-        
+
     return (response as List).map((e) => TicketType.fromJson(e)).toList();
   }
 
@@ -69,9 +68,10 @@ class EventRepository {
         .insert(ticket.toJson()..remove('id')..remove('quantity_sold'))
         .select()
         .single();
-        
+
     return TicketType.fromJson(response);
   }
+
   Future<List<Map<String, dynamic>>> getPromoCodes(String eventId) async {
     final response = await _client
         .from('promo_codes')
@@ -110,17 +110,15 @@ class EventRepository {
   }
 
   Future<void> updateEventStatus(String eventId, String status) async {
-    await _client
-        .from('events')
-        .update({'status': status})
-        .eq('id', eventId);
+    await _client.from('events').update({'status': status}).eq('id', eventId);
   }
 
   // Organizer Attendee Roster
   Future<List<Map<String, dynamic>>> getEventAttendees(String eventId) async {
     final response = await _client
         .from('bookings')
-        .select('id, quantity, total_amount, status, created_at, users(name, email), ticket_types(name)')
+        .select(
+            'id, quantity, total_amount, status, created_at, users(name, email), ticket_types(name)')
         .eq('event_id', eventId)
         .order('created_at', ascending: false);
     return (response as List).cast<Map<String, dynamic>>();
@@ -128,16 +126,12 @@ class EventRepository {
 
   // Reviews & Ratings
   Future<List<Map<String, dynamic>>> getEventReviews(String eventId) async {
-    try {
-      final response = await _client
-          .from('reviews')
-          .select()
-          .eq('event_id', eventId)
-          .order('created_at', ascending: false);
-      return (response as List).cast<Map<String, dynamic>>();
-    } catch (_) {
-      return [];
-    }
+    final response = await _client
+        .from('reviews')
+        .select()
+        .eq('event_id', eventId)
+        .order('created_at', ascending: false);
+    return (response as List).cast<Map<String, dynamic>>();
   }
 
   Future<void> submitReview({
@@ -162,11 +156,10 @@ class EventRepository {
     required Uint8List bytes,
     required String extension,
   }) async {
-    final path = 'banners/$organizerId/${DateTime.now().millisecondsSinceEpoch}.$extension';
-    await _client.storage
-        .from('event-banners')
-        .uploadBinary(path, bytes,
-            fileOptions: FileOptions(contentType: 'image/$extension', upsert: true));
+    final path =
+        'banners/$organizerId/${DateTime.now().millisecondsSinceEpoch}.$extension';
+    await _client.storage.from('event-banners').uploadBinary(path, bytes,
+        fileOptions: FileOptions(contentType: 'image/$extension', upsert: true));
     return _client.storage.from('event-banners').getPublicUrl(path);
   }
 }

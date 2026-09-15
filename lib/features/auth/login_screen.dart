@@ -70,7 +70,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               'If you already created an account, click "Already have an account? Sign in" below!';
         } else if (errStr.contains('Invalid login credentials')) {
           _errorMessage =
-              '❌ Invalid email or password. If you haven\'t signed up yet, click "Don\'t have an account? Sign up".';
+              '❌ Invalid email or password. Please check your credentials or register a new account.';
         } else if (errStr.contains('User already registered')) {
           _errorMessage =
               'ℹ️ This email is already registered! Switch to "Sign in" below to log in.';
@@ -81,15 +81,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
-  }
-
-  void _fillDemoCredentials(String email, String password) {
-    setState(() {
-      _isLogin = true;
-      _emailController.text = email;
-      _passwordController.text = password;
-      _errorMessage = null;
-    });
   }
 
   @override
@@ -264,61 +255,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   child: Text(_isLogin
                       ? "Don't have an account? Sign up"
                       : "Already have an account? Sign in"),
-                ),
-
-                const Divider(height: 32),
-
-                // ── Quick Demo Login Shortcuts ──────────────────────
-                Text(
-                  'Quick Demo Login:',
-                  style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: colorScheme.onSurfaceVariant),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () => _fillDemoCredentials(
-                            'attendee@eventhub.io', 'password123'),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          visualDensity: VisualDensity.compact,
-                        ),
-                        child: const Text('Attendee',
-                            style: TextStyle(fontSize: 11)),
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () => _fillDemoCredentials(
-                            'organizer@eventhub.io', 'password123'),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          visualDensity: VisualDensity.compact,
-                        ),
-                        child: const Text('Organizer',
-                            style: TextStyle(fontSize: 11)),
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () => _fillDemoCredentials(
-                            'admin@eventhub.io', 'password123'),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          visualDensity: VisualDensity.compact,
-                        ),
-                        child: const Text('Admin',
-                            style: TextStyle(fontSize: 11)),
-                      ),
-                    ),
-                  ],
                 ),
               ],
             ),
