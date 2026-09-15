@@ -19,7 +19,28 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   bool _isLoading = false;
   String? _errorMessage;
 
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    _nameController.dispose();
+    super.dispose();
+  }
+
   Future<void> _submit() async {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
+
+    if (email.isEmpty || password.isEmpty) {
+      setState(() => _errorMessage = 'Please enter both email and password.');
+      return;
+    }
+
+    if (!_isLogin && _nameController.text.trim().isEmpty) {
+      setState(() => _errorMessage = 'Please enter your full name.');
+      return;
+    }
+
     setState(() {
       _isLoading = true;
       _errorMessage = null;
@@ -28,45 +49,69 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     try {
       if (_isLogin) {
         await ref.read(authControllerProvider.notifier).signIn(
-              _emailController.text.trim(),
-              _passwordController.text,
+              email,
+              password,
             );
       } else {
         await ref.read(authControllerProvider.notifier).signUp(
-              _emailController.text.trim(),
-              _passwordController.text,
+              email,
+              password,
               _nameController.text.trim(),
               _selectedRole,
             );
       }
     } catch (e) {
+      final errStr = e.toString();
       setState(() {
-        _errorMessage = e.toString();
+        if (errStr.contains('over_email_send_rate_limit') ||
+            errStr.contains('security purposes')) {
+          _errorMessage =
+              '⏱️ Supabase Email Rate Limit: You can only request 1 email per minute.\n'
+              'If you already created an account, click "Already have an account? Sign in" below!';
+        } else if (errStr.contains('Invalid login credentials')) {
+          _errorMessage =
+              '❌ Invalid email or password. If you haven\'t signed up yet, click "Don\'t have an account? Sign up".';
+        } else if (errStr.contains('User already registered')) {
+          _errorMessage =
+              'ℹ️ This email is already registered! Switch to "Sign in" below to log in.';
+        } else {
+          _errorMessage = errStr.replaceAll('Exception:', '').trim();
+        }
       });
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
   }
 
+  void _fillDemoCredentials(String email, String password) {
+    setState(() {
+      _isLogin = true;
+      _emailController.text = email;
+      _passwordController.text = password;
+      _errorMessage = null;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    
+
     return Scaffold(
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
           child: Container(
-            constraints: const BoxConstraints(maxWidth: 400),
+            constraints: const BoxConstraints(maxWidth: 420),
             padding: const EdgeInsets.all(32),
             decoration: BoxDecoration(
               color: colorScheme.surface,
               borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: colorScheme.outlineVariant),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.2),
-                  blurRadius: 20,
-                  offset: const Offset(0, 10),
+                  color: Colors.black.withValues(alpha: 0.15),
+                  blurRadius: 24,
+                  offset: const Offset(0, 12),
                 ),
               ],
             ),
@@ -74,58 +119,91 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(
-                  _isLogin ? 'Welcome Back' : 'Join EventHub',
-                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                // ── Header ──────────────────────────────────────────
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.confirmation_number,
+                        size: 32, color: colorScheme.primary),
+                    const SizedBox(width: 10),
+                    Text(
+                      'EventHub',
+                      style: TextStyle(
+                        fontSize: 26,
                         fontWeight: FontWeight.bold,
                         color: colorScheme.primary,
+                        letterSpacing: 0.5,
                       ),
-                  textAlign: TextAlign.center,
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 8),
+                Text(
+                  _isLogin ? 'Welcome Back — Sign In' : 'Join EventHub — Register',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      fontSize: 14, color: colorScheme.onSurfaceVariant),
+                ),
+                const SizedBox(height: 28),
+
+                // ── Full Name (Register only) ──────────────────────
                 if (!_isLogin) ...[
                   TextField(
                     controller: _nameController,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: 'Full Name',
-                      border: OutlineInputBorder(),
+                      prefixIcon: const Icon(Icons.person_outlined),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12)),
                     ),
                   ),
                   const SizedBox(height: 16),
                 ],
+
+                // ── Email ───────────────────────────────────────────
                 TextField(
                   controller: _emailController,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'Email Address',
-                    border: OutlineInputBorder(),
+                    prefixIcon: const Icon(Icons.email_outlined),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12)),
                   ),
                   keyboardType: TextInputType.emailAddress,
                 ),
                 const SizedBox(height: 16),
+
+                // ── Password ────────────────────────────────────────
                 TextField(
                   controller: _passwordController,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'Password',
-                    border: OutlineInputBorder(),
+                    prefixIcon: const Icon(Icons.lock_outlined),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12)),
                   ),
                   obscureText: true,
                 ),
                 const SizedBox(height: 16),
+
+                // ── Role Selector (Register only) ───────────────────
                 if (!_isLogin) ...[
                   DropdownButtonFormField<UserRole>(
                     initialValue: _selectedRole,
-                    decoration: const InputDecoration(
-                      labelText: 'I am a...',
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: 'Account Type',
+                      prefixIcon: const Icon(Icons.badge_outlined),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12)),
                     ),
                     items: const [
                       DropdownMenuItem(
                         value: UserRole.attendee,
-                        child: Text('Attendee'),
+                        child: Text('Attendee (Discover & Book)'),
                       ),
                       DropdownMenuItem(
                         value: UserRole.organizer,
-                        child: Text('Event Organizer'),
+                        child: Text('Event Organizer (Host & Manage)'),
                       ),
                     ],
                     onChanged: (role) {
@@ -134,29 +212,48 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                   const SizedBox(height: 16),
                 ],
+
+                // ── Error Message Banner ────────────────────────────
                 if (_errorMessage != null)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 16),
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 16),
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: colorScheme.errorContainer,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                     child: Text(
                       _errorMessage!,
-                      style: TextStyle(color: colorScheme.error),
+                      style: TextStyle(
+                          color: colorScheme.onErrorContainer, fontSize: 13),
                       textAlign: TextAlign.center,
                     ),
                   ),
-                ElevatedButton(
+
+                // ── Submit Button ───────────────────────────────────
+                FilledButton(
                   onPressed: _isLoading ? null : _submit,
-                  style: ElevatedButton.styleFrom(
+                  style: FilledButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
                   ),
                   child: _isLoading
                       ? const SizedBox(
                           height: 20,
                           width: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
+                          child: CircularProgressIndicator(
+                              color: Colors.white, strokeWidth: 2),
                         )
-                      : Text(_isLogin ? 'Sign In' : 'Create Account'),
+                      : Text(
+                          _isLogin ? 'Sign In' : 'Create Account',
+                          style: const TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
+
+                // ── Toggle Login / Sign Up ──────────────────────────
                 TextButton(
                   onPressed: () {
                     setState(() {
@@ -167,6 +264,61 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   child: Text(_isLogin
                       ? "Don't have an account? Sign up"
                       : "Already have an account? Sign in"),
+                ),
+
+                const Divider(height: 32),
+
+                // ── Quick Demo Login Shortcuts ──────────────────────
+                Text(
+                  'Quick Demo Login:',
+                  style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.onSurfaceVariant),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => _fillDemoCredentials(
+                            'attendee@eventhub.io', 'password123'),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          visualDensity: VisualDensity.compact,
+                        ),
+                        child: const Text('Attendee',
+                            style: TextStyle(fontSize: 11)),
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => _fillDemoCredentials(
+                            'organizer@eventhub.io', 'password123'),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          visualDensity: VisualDensity.compact,
+                        ),
+                        child: const Text('Organizer',
+                            style: TextStyle(fontSize: 11)),
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => _fillDemoCredentials(
+                            'admin@eventhub.io', 'password123'),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          visualDensity: VisualDensity.compact,
+                        ),
+                        child: const Text('Admin',
+                            style: TextStyle(fontSize: 11)),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
