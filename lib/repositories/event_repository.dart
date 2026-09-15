@@ -71,6 +71,32 @@ class EventRepository {
         
     return TicketType.fromJson(response);
   }
+  Future<List<Map<String, dynamic>>> getPromoCodes(String eventId) async {
+    final response = await _client
+        .from('promo_codes')
+        .select()
+        .eq('event_id', eventId)
+        .order('created_at', ascending: false);
+    return (response as List).cast<Map<String, dynamic>>();
+  }
+
+  Future<void> createPromoCode({
+    required String eventId,
+    required String code,
+    double? discountAmount,
+    double? discountPercent,
+    int? maxUses,
+    DateTime? validUntil,
+  }) async {
+    await _client.from('promo_codes').insert({
+      'event_id': eventId,
+      'code': code,
+      if (discountAmount != null) 'discount_amount': discountAmount,
+      if (discountPercent != null) 'discount_percent': discountPercent,
+      if (maxUses != null) 'max_uses': maxUses,
+      if (validUntil != null) 'valid_until': validUntil.toIso8601String(),
+    });
+  }
 }
 
 @riverpod

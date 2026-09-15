@@ -74,6 +74,11 @@ class _OrganizerDashboardScreenState extends ConsumerState<OrganizerDashboardScr
                       onPressed: () => context.push('/organizer/event/${event.id}/analytics'),
                     ),
                     IconButton(
+                      icon: const Icon(Icons.local_offer, color: Colors.purple),
+                      tooltip: 'Promo Codes & Refunds',
+                      onPressed: () => context.push('/organizer/event/${event.id}/promo'),
+                    ),
+                    IconButton(
                       icon: const Icon(Icons.confirmation_num, color: Colors.green),
                       tooltip: 'Tickets',
                       onPressed: () => context.push('/organizer/event/${event.id}/tickets'),

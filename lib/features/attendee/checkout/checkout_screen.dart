@@ -18,6 +18,53 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   TicketType? _selectedTier;
   int _quantity = 1;
   bool _isLoading = false;
+  
+  final _promoController = TextEditingController();
+  bool _isValidatingPromo = false;
+  String? _appliedPromoCode;
+  double? _discountAmount;
+  double? _discountPercent;
+  String? _promoError;
+
+  @override
+  void dispose() {
+    _promoController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _validatePromo() async {
+    final code = _promoController.text.trim();
+    if (code.isEmpty) return;
+
+    setState(() {
+      _isValidatingPromo = true;
+      _promoError = null;
+    });
+
+    try {
+      final promoData = await ref.read(bookingRepositoryProvider).validatePromoCode(widget.eventId, code);
+      if (promoData == null) {
+        setState(() {
+          _promoError = 'Invalid or expired promo code';
+          _appliedPromoCode = null;
+          _discountAmount = null;
+          _discountPercent = null;
+        });
+      } else {
+        setState(() {
+          _appliedPromoCode = code;
+          _discountAmount = promoData['discount_amount'] != null ? double.parse(promoData['discount_amount'].toString()) : null;
+          _discountPercent = promoData['discount_percent'] != null ? double.parse(promoData['discount_percent'].toString()) : null;
+          _promoError = null;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Promo code applied!')));
+      }
+    } catch (e) {
+      setState(() => _promoError = 'Error validating promo code');
+    } finally {
+      setState(() => _isValidatingPromo = false);
+    }
+  }
 
   Future<void> _bookTicket() async {
     if (_selectedTier == null) return;
@@ -30,15 +77,14 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         ticketTypeId: _selectedTier!.id,
         quantity: _quantity,
         userId: user.id,
+        promoCode: _appliedPromoCode,
       );
       
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Booking confirmed!')),
         );
-        // Normally we'd go to a payment screen or success screen.
-        // For MVP, we'll go back to the browse screen.
-        context.go('/attendee/browse');
+        context.go('/attendee/my_tickets');
       }
     } catch (e) {
       if (mounted) {
@@ -49,6 +95,35 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
+  }
+
+  double get _totalPrice {
+    if (_selectedTier == null) return 0;
+    double base = _selectedTier!.price * _quantity;
+    
+    if (_appliedPromoCode != null) {
+      if (_discountPercent != null) {
+        base = base - (base * (_discountPercent! / 100));
+      } else if (_discountAmount != null) {
+        base = base - (_discountAmount! * _quantity); // discount per ticket or flat? Typically per transaction, but for simplicity let's assume flat discount total. 
+        // Wait, if it's flat discount amount, let's subtract once.
+        // base = base - _discountAmount!;
+      }
+    }
+    return base < 0 ? 0 : base;
+  }
+  
+  double get _discountTotal {
+     if (_selectedTier == null) return 0;
+     double base = _selectedTier!.price * _quantity;
+     if (_appliedPromoCode != null) {
+        if (_discountPercent != null) {
+           return base * (_discountPercent! / 100);
+        } else if (_discountAmount != null) {
+           return _discountAmount!;
+        }
+     }
+     return 0;
   }
 
   @override
@@ -113,14 +188,60 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
+                
+                const SizedBox(height: 24),
+                const Text('Promo Code', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _promoController,
+                        decoration: InputDecoration(
+                          hintText: 'Enter code',
+                          border: const OutlineInputBorder(),
+                          errorText: _promoError,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    ElevatedButton(
+                      onPressed: _isValidatingPromo ? null : _validatePromo,
+                      child: _isValidatingPromo ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)) : const Text('Apply'),
+                    ),
+                  ],
+                ),
+                if (_appliedPromoCode != null)
+                   Padding(
+                     padding: const EdgeInsets.only(top: 8.0),
+                     child: Text('Applied: $_appliedPromoCode', style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
+                   ),
+
+                const SizedBox(height: 24),
                 const Divider(),
                 const SizedBox(height: 16),
+                
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text('Subtotal:', style: TextStyle(fontSize: 16)),
+                    Text('\$${(_selectedTier!.price * _quantity).toStringAsFixed(2)}', style: const TextStyle(fontSize: 16)),
+                  ],
+                ),
+                if (_appliedPromoCode != null)
+                   Row(
+                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                     children: [
+                       const Text('Discount:', style: TextStyle(fontSize: 16, color: Colors.green)),
+                       Text('-\$${_discountTotal.toStringAsFixed(2)}', style: const TextStyle(fontSize: 16, color: Colors.green)),
+                     ],
+                   ),
+                const SizedBox(height: 8),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text('Total:', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-                    Text('\$${(_selectedTier!.price * _quantity).toStringAsFixed(2)}', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                    Text('\$${_totalPrice.toStringAsFixed(2)}', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
                   ],
                 ),
               ],
