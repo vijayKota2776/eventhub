@@ -16,8 +16,8 @@ import 'package:eventhub/features/organizer/ticket_tiers/ticket_tiers_screen.dar
 import 'package:eventhub/features/organizer/analytics/analytics_screen.dart';
 import 'package:eventhub/features/organizer/promo_manager/promo_manager_screen.dart';
 import 'package:eventhub/features/admin/dashboard/admin_dashboard_screen.dart';
-
 import 'package:eventhub/features/organizer/attendees/attendees_screen.dart';
+import 'package:eventhub/features/attendee/seat_selection/seat_selection_screen.dart';
 
 part 'app_router.g.dart';
 
@@ -64,7 +64,11 @@ GoRouter router(Ref ref) {
       GoRoute(path: '/attendee/my_tickets', builder: (_, _) => const MyTicketsScreen()),
       GoRoute(path: '/attendee/ticket_qr', builder: (_, state) => TicketQrScreen(booking: state.extra as Booking)),
       GoRoute(path: '/attendee/event/:id', builder: (_, state) => EventDetailScreen(eventId: state.pathParameters['id']!)),
-      GoRoute(path: '/attendee/event/:id/checkout', builder: (_, state) => CheckoutScreen(eventId: state.pathParameters['id']!)),
+      GoRoute(path: '/attendee/event/:id/seats', builder: (_, state) => SeatSelectionScreen(eventId: state.pathParameters['id']!)),
+      GoRoute(path: '/attendee/event/:id/checkout', builder: (_, state) => CheckoutScreen(
+        eventId: state.pathParameters['id']!,
+        selectedSeats: (state.extra as Map<String, dynamic>?)?['selectedSeats'] as List<String>?,
+      )),
 
       // ── Organizer ──────────────────────────────────────────────
       GoRoute(path: '/organizer/dashboard', builder: (_, _) => const OrganizerDashboardScreen()),

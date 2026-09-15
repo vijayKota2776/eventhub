@@ -5,10 +5,12 @@ import 'package:eventhub/models/ticket_type.dart';
 import 'package:eventhub/providers/auth_provider.dart';
 import 'package:eventhub/repositories/event_repository.dart';
 import 'package:eventhub/repositories/booking_repository.dart';
+import 'package:eventhub/core/providers/currency_provider.dart';
 
 class CheckoutScreen extends ConsumerStatefulWidget {
   final String eventId;
-  const CheckoutScreen({super.key, required this.eventId});
+  final List<String>? selectedSeats;
+  const CheckoutScreen({super.key, required this.eventId, this.selectedSeats});
 
   @override
   ConsumerState<CheckoutScreen> createState() => _CheckoutScreenState();
@@ -18,6 +20,10 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   TicketType? _selectedTier;
   int _quantity = 1;
   bool _isLoading = false;
+
+  // When seats are pre-selected, quantity is locked to number of seats
+  bool get _hasPreSelectedSeats => widget.selectedSeats != null && widget.selectedSeats!.isNotEmpty;
+  int get _effectiveQuantity => _hasPreSelectedSeats ? widget.selectedSeats!.length : _quantity;
 
   final _promoController = TextEditingController();
   bool _isValidatingPromo = false;
@@ -70,7 +76,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
   double get _totalPrice {
     if (_selectedTier == null) return 0;
-    double base = _selectedTier!.price * _quantity;
+    double base = _selectedTier!.price * _effectiveQuantity;
 
     if (_appliedPromoCode != null) {
       if (_discountPercent != null) {
@@ -84,7 +90,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
   double get _discountTotal {
     if (_selectedTier == null) return 0;
-    double base = _selectedTier!.price * _quantity;
+    double base = _selectedTier!.price * _effectiveQuantity;
     if (_appliedPromoCode != null) {
       if (_discountPercent != null) {
         return base * (_discountPercent! / 100);
@@ -125,7 +131,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       final user = ref.read(authControllerProvider).value!;
       await ref.read(bookingRepositoryProvider).bookTicket(
         ticketTypeId: _selectedTier!.id,
-        quantity: _quantity,
+        quantity: _effectiveQuantity,
         userId: user.id,
         promoCode: _appliedPromoCode,
       );
@@ -176,6 +182,8 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final currency = ref.watch(currencyProvider);
+
     return Scaffold(
       appBar: AppBar(title: const Text('Checkout')),
       body: FutureBuilder<List<TicketType>>(
@@ -196,6 +204,51 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           return ListView(
             padding: const EdgeInsets.all(16),
             children: [
+              // ── Pre-selected Seats Banner ────────────────────────
+              if (_hasPreSelectedSeats) ...[
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.blue.shade200),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.event_seat, color: Colors.blue, size: 18),
+                          const SizedBox(width: 6),
+                          Text('Your Selected Seats (${widget.selectedSeats!.length})',
+                              style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.blue)),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Wrap(
+                        spacing: 6,
+                        runSpacing: 4,
+                        children: widget.selectedSeats!.map((seat) {
+                          final row = seat[0];
+                          Color chipColor = Colors.grey.shade700;
+                          if (row == 'A' || row == 'B') chipColor = Colors.amber.shade700;
+                          if (row == 'C' || row == 'D') chipColor = Colors.purple;
+                          return Chip(
+                            label: Text(seat, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+                            backgroundColor: chipColor,
+                            padding: EdgeInsets.zero,
+                            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          );
+                        }).toList(),
+                      ),
+                      const SizedBox(height: 4),
+                      const Text('Quantity is locked to your seat count.',
+                          style: TextStyle(fontSize: 11, color: Colors.grey)),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+              ],
               Text('Select Ticket Tier', style: Theme.of(context).textTheme.titleLarge),
               const SizedBox(height: 16),
               ...tickets.map((t) {
@@ -232,34 +285,36 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
               }),
               if (_selectedTier != null) ...[
                 const SizedBox(height: 24),
-                Card(
-                  elevation: 1,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text('Ticket Quantity:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                        Row(
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.remove_circle_outline),
-                              onPressed: _quantity > 1 ? () => setState(() => _quantity--) : null,
-                            ),
-                            Text('$_quantity', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                            IconButton(
-                              icon: const Icon(Icons.add_circle_outline),
-                              onPressed: _quantity < (_selectedTier!.quantityTotal - _selectedTier!.quantitySold)
-                                  ? () => setState(() => _quantity++)
-                                  : null,
-                            ),
-                          ],
-                        ),
-                      ],
+                // Only show quantity selector if not coming from seat selection
+                if (!_hasPreSelectedSeats)
+                  Card(
+                    elevation: 1,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text('Ticket Quantity:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                          Row(
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.remove_circle_outline),
+                                onPressed: _quantity > 1 ? () => setState(() => _quantity--) : null,
+                              ),
+                              Text('$_quantity', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                              IconButton(
+                                icon: const Icon(Icons.add_circle_outline),
+                                onPressed: _quantity < (_selectedTier!.quantityTotal - _selectedTier!.quantitySold)
+                                    ? () => setState(() => _quantity++)
+                                    : null,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
 
                 const SizedBox(height: 20),
                 const Text('Promo Code', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
@@ -308,7 +363,8 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text('Subtotal:', style: TextStyle(fontSize: 16)),
-                    Text('\$${(_selectedTier!.price * _quantity).toStringAsFixed(2)}', style: const TextStyle(fontSize: 16)),
+                    Text(CurrencyHelper.format(_selectedTier!.price * _effectiveQuantity, currency),
+                        style: const TextStyle(fontSize: 16)),
                   ],
                 ),
                 if (_appliedPromoCode != null) ...[
@@ -317,7 +373,8 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text('Promo Discount:', style: TextStyle(fontSize: 16, color: Colors.green)),
-                      Text('-\$${_discountTotal.toStringAsFixed(2)}', style: const TextStyle(fontSize: 16, color: Colors.green, fontWeight: FontWeight.bold)),
+                      Text('-${CurrencyHelper.format(_discountTotal, currency)}',
+                          style: const TextStyle(fontSize: 16, color: Colors.green, fontWeight: FontWeight.bold)),
                     ],
                   ),
                 ],
@@ -326,7 +383,8 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text('Total Amount:', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-                    Text('\$${_totalPrice.toStringAsFixed(2)}', style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.blue)),
+                    Text(CurrencyHelper.format(_totalPrice, currency),
+                        style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.blue)),
                   ],
                 ),
                 const SizedBox(height: 80),
@@ -341,9 +399,12 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           child: ElevatedButton.icon(
             onPressed: (_selectedTier != null && !_isLoading) ? _openPaymentGateway : null,
             icon: _isLoading ? const SizedBox() : const Icon(Icons.lock_outline),
-            label: _isLoading 
-                ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) 
-                : Text('Proceed to Pay \$${_totalPrice.toStringAsFixed(2)}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            label: _isLoading
+                ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                : Text(
+                    'Proceed to Pay ${CurrencyHelper.format(_totalPrice, ref.watch(currencyProvider))}',
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),

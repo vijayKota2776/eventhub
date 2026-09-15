@@ -100,6 +100,34 @@ class BookingRepository {
       await _client.from('bookings').update({'status': 'refunded'}).eq('id', refund['booking_id']);
     }
   }
+
+  Future<void> transferTicket({
+    required String bookingId,
+    required String currentUserId,
+    required String recipientEmail,
+  }) async {
+    final cleanEmail = recipientEmail.trim().toLowerCase();
+    final recipient = await _client
+        .from('users')
+        .select('id, name')
+        .eq('email', cleanEmail)
+        .maybeSingle();
+
+    if (recipient == null) {
+      throw Exception('No user found with email "$recipientEmail". Ask them to sign up first!');
+    }
+
+    if (recipient['id'] == currentUserId) {
+      throw Exception('You cannot transfer a ticket to yourself.');
+    }
+
+    final newQrToken = const Uuid().v4().replaceAll('-', '');
+
+    await _client.from('bookings').update({
+      'user_id': recipient['id'],
+      'qr_token': newQrToken,
+    }).eq('id', bookingId).eq('user_id', currentUserId);
+  }
 }
 
 @riverpod
