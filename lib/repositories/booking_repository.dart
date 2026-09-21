@@ -21,13 +21,17 @@ class BookingRepository {
     // Generate an idempotency key
     final idempotencyKey = const Uuid().v4();
 
-    final response = await _client.rpc('book_ticket', params: {
-      'p_ticket_type_id': ticketTypeId,
-      'p_qty': quantity,
-      'p_user_id': userId,
-      'p_idem': idempotencyKey,
-      if (promoCode != null && promoCode.isNotEmpty) 'p_promo_code': promoCode,
-    });
+    final response = await _client.rpc(
+      'book_ticket',
+      params: {
+        'p_ticket_type_id': ticketTypeId,
+        'p_qty': quantity,
+        'p_user_id': userId,
+        'p_idem': idempotencyKey,
+        if (promoCode != null && promoCode.isNotEmpty)
+          'p_promo_code': promoCode,
+      },
+    );
 
     return response as String; // Returns the booking ID
   }
@@ -43,14 +47,17 @@ class BookingRepository {
   }
 
   Future<String> checkInTicket(String bookingId, String staffId) async {
-    final response = await _client.rpc('check_in', params: {
-      'p_booking_id': bookingId,
-      'p_staff': staffId,
-    });
+    final response = await _client.rpc(
+      'check_in',
+      params: {'p_booking_id': bookingId, 'p_staff': staffId},
+    );
     return response as String;
   }
 
-  Future<Map<String, dynamic>?> validatePromoCode(String eventId, String code) async {
+  Future<Map<String, dynamic>?> validatePromoCode(
+    String eventId,
+    String code,
+  ) async {
     final response = await _client
         .from('promo_codes')
         .select()
@@ -74,7 +81,12 @@ class BookingRepository {
 
     return response;
   }
-  Future<void> requestRefund(String bookingId, double amount, String reason) async {
+
+  Future<void> requestRefund(
+    String bookingId,
+    double amount,
+    String reason,
+  ) async {
     await _client.from('refunds').insert({
       'booking_id': bookingId,
       'amount': amount,
@@ -83,7 +95,9 @@ class BookingRepository {
     });
   }
 
-  Future<List<Map<String, dynamic>>> getRefundRequestsForEvent(String eventId) async {
+  Future<List<Map<String, dynamic>>> getRefundRequestsForEvent(
+    String eventId,
+  ) async {
     final response = await _client
         .from('refunds')
         .select('*, bookings!inner(event_id)')
@@ -96,8 +110,15 @@ class BookingRepository {
     await _client.from('refunds').update({'status': status}).eq('id', refundId);
     if (status == 'approved') {
       // Update booking status to refunded
-      final refund = await _client.from('refunds').select('booking_id').eq('id', refundId).single();
-      await _client.from('bookings').update({'status': 'refunded'}).eq('id', refund['booking_id']);
+      final refund = await _client
+          .from('refunds')
+          .select('booking_id')
+          .eq('id', refundId)
+          .single();
+      await _client
+          .from('bookings')
+          .update({'status': 'refunded'})
+          .eq('id', refund['booking_id']);
     }
   }
 
@@ -114,7 +135,9 @@ class BookingRepository {
         .maybeSingle();
 
     if (recipient == null) {
-      throw Exception('No user found with email "$recipientEmail". Ask them to sign up first!');
+      throw Exception(
+        'No user found with email "$recipientEmail". Ask them to sign up first!',
+      );
     }
 
     if (recipient['id'] == currentUserId) {
@@ -123,10 +146,11 @@ class BookingRepository {
 
     final newQrToken = const Uuid().v4().replaceAll('-', '');
 
-    await _client.from('bookings').update({
-      'user_id': recipient['id'],
-      'qr_token': newQrToken,
-    }).eq('id', bookingId).eq('user_id', currentUserId);
+    await _client
+        .from('bookings')
+        .update({'user_id': recipient['id'], 'qr_token': newQrToken})
+        .eq('id', bookingId)
+        .eq('user_id', currentUserId);
   }
 
   /// Books one ticket per attendee in a group. Each gets a unique QR token.
@@ -142,12 +166,15 @@ class BookingRepository {
     for (final attendee in attendees) {
       final idempotencyKey = const Uuid().v4();
       try {
-        final response = await _client.rpc('book_ticket', params: {
-          'p_ticket_type_id': ticketTypeId,
-          'p_qty': 1,
-          'p_user_id': userId,
-          'p_idem': idempotencyKey,
-        });
+        final response = await _client.rpc(
+          'book_ticket',
+          params: {
+            'p_ticket_type_id': ticketTypeId,
+            'p_qty': 1,
+            'p_user_id': userId,
+            'p_idem': idempotencyKey,
+          },
+        );
 
         // Annotate with attendee info on the booking metadata
         final bookingId = response?.toString() ?? idempotencyKey;

@@ -9,7 +9,9 @@ class CalendarUtils {
     final startStr = format.format(event.startAt.toUtc());
     final endStr = format.format(event.endAt.toUtc());
     final title = Uri.encodeComponent(event.title);
-    final details = Uri.encodeComponent(event.description ?? 'Event booked via EventHub');
+    final details = Uri.encodeComponent(
+      event.description ?? 'Event booked via EventHub',
+    );
     final location = Uri.encodeComponent('${event.venue}, ${event.city}');
 
     return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=$title&dates=$startStr/$endStr&details=$details&location=$location';
@@ -36,7 +38,9 @@ Book your tickets exclusively on EventHub!
     Clipboard.setData(ClipboardData(text: text));
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('🎉 Event invitation copied to clipboard! Share it with friends.'),
+        content: Text(
+          '🎉 Event invitation copied to clipboard! Share it with friends.',
+        ),
         backgroundColor: Colors.green,
       ),
     );

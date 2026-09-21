@@ -16,9 +16,5 @@ void main() async {
     publishableKey: dotenv.env['SUPABASE_ANON_KEY'] ?? 'anon-key',
   );
 
-  runApp(
-    const ProviderScope(
-      child: EventHubApp(),
-    ),
-  );
+  runApp(const ProviderScope(child: EventHubApp()));
 }

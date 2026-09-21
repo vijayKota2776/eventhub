@@ -28,13 +28,17 @@ class _EventDetailScreenState extends ConsumerState<EventDetailScreen> {
   }
 
   void _loadReviews() {
-    _reviewsFuture = ref.read(eventRepositoryProvider).getEventReviews(widget.eventId);
+    _reviewsFuture = ref
+        .read(eventRepositoryProvider)
+        .getEventReviews(widget.eventId);
   }
 
   Future<void> _checkWaitlist() async {
     final user = ref.read(authControllerProvider).value;
     if (user == null) return;
-    final on = await ref.read(waitlistRepositoryProvider).isOnWaitlist(widget.eventId, user.id);
+    final on = await ref
+        .read(waitlistRepositoryProvider)
+        .isOnWaitlist(widget.eventId, user.id);
     if (mounted) setState(() => _onWaitlist = on);
   }
 
@@ -48,13 +52,20 @@ class _EventDetailScreenState extends ConsumerState<EventDetailScreen> {
         await repo.leaveWaitlist(widget.eventId, user.id);
         if (mounted) {
           setState(() => _onWaitlist = false);
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Left waitlist.')));
+          ScaffoldMessenger.of(context)
+              .showSnackBar(const SnackBar(content: Text('Left waitlist.')));
         }
       } else {
         await repo.joinWaitlist(widget.eventId, user.id);
         if (mounted) {
           setState(() => _onWaitlist = true);
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("You're on the waitlist! We'll notify you when tickets open up.")));
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                "You're on the waitlist! We'll notify you when tickets open up.",
+              ),
+            ),
+          );
         }
       }
     } finally {
@@ -84,7 +95,9 @@ class _EventDetailScreenState extends ConsumerState<EventDetailScreen> {
                       final star = index + 1;
                       return IconButton(
                         icon: Icon(
-                          star <= selectedRating ? Icons.star : Icons.star_border,
+                          star <= selectedRating
+                              ? Icons.star
+                              : Icons.star_border,
                           color: Colors.amber,
                           size: 32,
                         ),
@@ -100,7 +113,9 @@ class _EventDetailScreenState extends ConsumerState<EventDetailScreen> {
                     maxLines: 3,
                     decoration: InputDecoration(
                       hintText: 'Share feedback about venue, speakers, organization...',
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                   ),
                 ],
@@ -117,18 +132,22 @@ class _EventDetailScreenState extends ConsumerState<EventDetailScreen> {
 
                     Navigator.pop(dialogContext);
                     try {
-                      await ref.read(eventRepositoryProvider).submitReview(
-                        eventId: widget.eventId,
-                        userId: user.id,
-                        userName: user.name ?? user.email.split('@').first,
-                        rating: selectedRating,
-                        comment: commentController.text.trim().isNotEmpty 
-                            ? commentController.text.trim() 
-                            : null,
-                      );
+                      await ref
+                          .read(eventRepositoryProvider)
+                          .submitReview(
+                            eventId: widget.eventId,
+                            userId: user.id,
+                            userName: user.name ?? user.email.split('@').first,
+                            rating: selectedRating,
+                            comment: commentController.text.trim().isNotEmpty
+                                ? commentController.text.trim()
+                                : null,
+                          );
                       if (mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('⭐ Review submitted! Thank you.')),
+                          const SnackBar(
+                            content: Text('⭐ Review submitted! Thank you.'),
+                          ),
                         );
                         setState(() {
                           _loadReviews();
@@ -136,9 +155,8 @@ class _EventDetailScreenState extends ConsumerState<EventDetailScreen> {
                       }
                     } catch (e) {
                       if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Error: $e')),
-                        );
+                        ScaffoldMessenger.of(context)
+                            .showSnackBar(SnackBar(content: Text('Error: $e')));
                       }
                     }
                   },
@@ -172,11 +190,13 @@ class _EventDetailScreenState extends ConsumerState<EventDetailScreen> {
                 expandedHeight: 250.0,
                 pinned: true,
                 flexibleSpace: FlexibleSpaceBar(
-                  background: event.bannerUrl != null && event.bannerUrl!.isNotEmpty
+                  background:
+                      event.bannerUrl != null && event.bannerUrl!.isNotEmpty
                       ? Image.network(
                           event.bannerUrl!,
                           fit: BoxFit.cover,
-                          errorBuilder: (_, _, _) => _buildPlaceholder(colorScheme),
+                          errorBuilder: (_, _, _) =>
+                              _buildPlaceholder(colorScheme),
                         )
                       : _buildPlaceholder(colorScheme),
                 ),
@@ -190,7 +210,10 @@ class _EventDetailScreenState extends ConsumerState<EventDetailScreen> {
                       Row(
                         children: [
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
                             decoration: BoxDecoration(
                               color: colorScheme.primaryContainer,
                               borderRadius: BorderRadius.circular(16),
@@ -211,9 +234,18 @@ class _EventDetailScreenState extends ConsumerState<EventDetailScreen> {
                             builder: (context, snapshot) {
                               final reviews = snapshot.data ?? [];
                               if (reviews.isEmpty) return const SizedBox();
-                              final avg = reviews.fold<double>(0, (s, r) => s + (r['rating'] as num).toDouble()) / reviews.length;
+                              final avg =
+                                  reviews.fold<double>(
+                                    0,
+                                    (s, r) =>
+                                        s + (r['rating'] as num).toDouble(),
+                                  ) /
+                                  reviews.length;
                               return Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 6,
+                                ),
                                 decoration: BoxDecoration(
                                   color: Colors.amber.withValues(alpha: 0.2),
                                   borderRadius: BorderRadius.circular(16),
@@ -221,11 +253,18 @@ class _EventDetailScreenState extends ConsumerState<EventDetailScreen> {
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    const Icon(Icons.star, color: Colors.amber, size: 16),
+                                    const Icon(
+                                      Icons.star,
+                                      color: Colors.amber,
+                                      size: 16,
+                                    ),
                                     const SizedBox(width: 4),
                                     Text(
                                       '${avg.toStringAsFixed(1)} (${reviews.length})',
-                                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 12,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -235,14 +274,21 @@ class _EventDetailScreenState extends ConsumerState<EventDetailScreen> {
                           if (isSoldOut) ...[
                             const SizedBox(width: 8),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 6,
+                              ),
                               decoration: BoxDecoration(
                                 color: Colors.red.shade100,
                                 borderRadius: BorderRadius.circular(16),
                               ),
                               child: const Text(
                                 'SOLD OUT',
-                                style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 12),
+                                style: TextStyle(
+                                  color: Colors.red,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                ),
                               ),
                             ),
                           ],
@@ -251,23 +297,37 @@ class _EventDetailScreenState extends ConsumerState<EventDetailScreen> {
                       const SizedBox(height: 16),
                       Text(
                         event.title,
-                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
+                        style: Theme.of(context).textTheme.headlineMedium
+                            ?.copyWith(fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 24),
                       _buildInfoRow(
                         context,
                         icon: Icons.calendar_today,
                         title: dateFormat.format(event.startAt),
-                        subtitle: '${timeFormat.format(event.startAt)} - ${timeFormat.format(event.endAt)}',
+                        subtitle:
+                            '${timeFormat.format(event.startAt)} - ${timeFormat.format(event.endAt)}',
                       ),
                       const SizedBox(height: 16),
-                      _buildInfoRow(context, icon: Icons.location_on, title: event.venue, subtitle: event.city),
+                      _buildInfoRow(
+                        context,
+                        icon: Icons.location_on,
+                        title: event.venue,
+                        subtitle: event.city,
+                      ),
                       const SizedBox(height: 32),
-                      Text('About Event', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+                      Text(
+                        'About Event',
+                        style: Theme.of(context).textTheme.titleLarge
+                            ?.copyWith(fontWeight: FontWeight.bold),
+                      ),
                       const SizedBox(height: 16),
                       Text(
                         event.description ?? 'No description available.',
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(height: 1.6, color: colorScheme.onSurfaceVariant),
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          height: 1.6,
+                          color: colorScheme.onSurfaceVariant,
+                        ),
                       ),
                       const SizedBox(height: 32),
 
@@ -275,9 +335,16 @@ class _EventDetailScreenState extends ConsumerState<EventDetailScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('Reviews & Ratings', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+                          Text(
+                            'Reviews & Ratings',
+                            style: Theme.of(context).textTheme.titleLarge
+                                ?.copyWith(fontWeight: FontWeight.bold),
+                          ),
                           TextButton.icon(
-                            icon: const Icon(Icons.rate_review_outlined, size: 18),
+                            icon: const Icon(
+                              Icons.rate_review_outlined,
+                              size: 18,
+                            ),
                             label: const Text('Add Review'),
                             onPressed: _showReviewDialog,
                           ),
@@ -287,19 +354,31 @@ class _EventDetailScreenState extends ConsumerState<EventDetailScreen> {
                       FutureBuilder<List<Map<String, dynamic>>>(
                         future: _reviewsFuture,
                         builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.waiting) {
-                            return const Center(child: Padding(padding: EdgeInsets.all(16), child: CircularProgressIndicator()));
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(16),
+                                child: CircularProgressIndicator(),
+                              ),
+                            );
                           }
                           final reviews = snapshot.data ?? [];
                           if (reviews.isEmpty) {
                             return Card(
                               elevation: 0,
-                              color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              color: colorScheme.surfaceContainerHighest
+                                  .withValues(alpha: 0.3),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
                               child: const Padding(
                                 padding: EdgeInsets.all(20),
                                 child: Center(
-                                  child: Text('No reviews yet. Be the first to share your thoughts!', style: TextStyle(color: Colors.grey)),
+                                  child: Text(
+                                    'No reviews yet. Be the first to share your thoughts!',
+                                    style: TextStyle(color: Colors.grey),
+                                  ),
                                 ),
                               ),
                             );
@@ -307,27 +386,44 @@ class _EventDetailScreenState extends ConsumerState<EventDetailScreen> {
 
                           return Column(
                             children: reviews.map((r) {
-                              final name = (r['user_name'] ?? 'Attendee').toString();
-                              final rating = (r['rating'] as num?)?.toInt() ?? 5;
+                              final name = (r['user_name'] ?? 'Attendee')
+                                  .toString();
+                              final rating =
+                                  (r['rating'] as num?)?.toInt() ?? 5;
                               final comment = r['comment'] as String?;
-                              final date = r['created_at'] != null ? r['created_at'].toString().substring(0, 10) : '';
+                              final date = r['created_at'] != null
+                                  ? r['created_at'].toString().substring(0, 10)
+                                  : '';
 
                               return Card(
                                 margin: const EdgeInsets.only(bottom: 12),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
                                 child: Padding(
                                   padding: const EdgeInsets.all(16),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
                                         children: [
-                                          Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                                          Text(
+                                            name,
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
                                           Row(
-                                            children: List.generate(5, (starIdx) {
+                                            children: List.generate(5, (
+                                              starIdx,
+                                            ) {
                                               return Icon(
-                                                starIdx < rating ? Icons.star : Icons.star_border,
+                                                starIdx < rating
+                                                    ? Icons.star
+                                                    : Icons.star_border,
                                                 color: Colors.amber,
                                                 size: 16,
                                               );
@@ -335,12 +431,22 @@ class _EventDetailScreenState extends ConsumerState<EventDetailScreen> {
                                           ),
                                         ],
                                       ),
-                                      if (comment != null && comment.isNotEmpty) ...[
+                                      if (comment != null &&
+                                          comment.isNotEmpty) ...[
                                         const SizedBox(height: 8),
-                                        Text(comment, style: const TextStyle(fontSize: 14)),
+                                        Text(
+                                          comment,
+                                          style: const TextStyle(fontSize: 14),
+                                        ),
                                       ],
                                       const SizedBox(height: 6),
-                                      Text(date, style: const TextStyle(fontSize: 11, color: Colors.grey)),
+                                      Text(
+                                        date,
+                                        style: const TextStyle(
+                                          fontSize: 11,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -367,22 +473,51 @@ class _EventDetailScreenState extends ConsumerState<EventDetailScreen> {
                     ? ElevatedButton.icon(
                         onPressed: _waitlistLoading ? null : _toggleWaitlist,
                         icon: _waitlistLoading
-                            ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                            : Icon(_onWaitlist == true ? Icons.notifications_off : Icons.notifications_active),
-                        label: Text(_onWaitlist == true ? 'Leave Waitlist' : 'Join Waitlist'),
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : Icon(
+                                _onWaitlist == true
+                                    ? Icons.notifications_off
+                                    : Icons.notifications_active,
+                              ),
+                        label: Text(
+                          _onWaitlist == true
+                              ? 'Leave Waitlist'
+                              : 'Join Waitlist',
+                        ),
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16),
-                          backgroundColor: _onWaitlist == true ? Colors.grey : Colors.orange,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          backgroundColor: _onWaitlist == true
+                              ? Colors.grey
+                              : Colors.orange,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
                         ),
                       )
                     : ElevatedButton(
-                        onPressed: () => context.push('/attendee/event/${widget.eventId}/checkout'),
+                        onPressed: () => context.push(
+                          '/attendee/event/${widget.eventId}/checkout',
+                        ),
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
                         ),
-                        child: const Text('Book Ticket', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                        child: const Text(
+                          'Book Ticket',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
               ),
             )
@@ -393,17 +528,29 @@ class _EventDetailScreenState extends ConsumerState<EventDetailScreen> {
   Widget _buildPlaceholder(ColorScheme colorScheme) {
     return Container(
       color: colorScheme.secondaryContainer,
-      child: Icon(Icons.event, size: 64, color: colorScheme.onSecondaryContainer),
+      child: Icon(
+        Icons.event,
+        size: 64,
+        color: colorScheme.onSecondaryContainer,
+      ),
     );
   }
 
-  Widget _buildInfoRow(BuildContext context, {required IconData icon, required String title, required String subtitle}) {
+  Widget _buildInfoRow(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required String subtitle,
+  }) {
     final colorScheme = Theme.of(context).colorScheme;
     return Row(
       children: [
         Container(
           padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(color: colorScheme.secondaryContainer, borderRadius: BorderRadius.circular(12)),
+          decoration: BoxDecoration(
+            color: colorScheme.secondaryContainer,
+            borderRadius: BorderRadius.circular(12),
+          ),
           child: Icon(icon, color: colorScheme.onSecondaryContainer),
         ),
         const SizedBox(width: 16),
@@ -411,9 +558,17 @@ class _EventDetailScreenState extends ConsumerState<EventDetailScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+              Text(
+                title,
+                style: Theme.of(context).textTheme.titleMedium
+                    ?.copyWith(fontWeight: FontWeight.bold),
+              ),
               const SizedBox(height: 4),
-              Text(subtitle, style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant)),
+              Text(
+                subtitle,
+                style: Theme.of(context).textTheme.bodyMedium
+                    ?.copyWith(color: colorScheme.onSurfaceVariant),
+              ),
             ],
           ),
         ),

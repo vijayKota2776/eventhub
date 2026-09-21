@@ -10,13 +10,24 @@ class SeatSelectionScreen extends ConsumerStatefulWidget {
   const SeatSelectionScreen({super.key, required this.eventId});
 
   @override
-  ConsumerState<SeatSelectionScreen> createState() => _SeatSelectionScreenState();
+  ConsumerState<SeatSelectionScreen> createState() =>
+      _SeatSelectionScreenState();
 }
 
 class _SeatSelectionScreenState extends ConsumerState<SeatSelectionScreen> {
   final Set<String> _selectedSeats = {};
   // Mock occupied seats in the venue
-  final Set<String> _occupiedSeats = {'A2', 'A6', 'B4', 'C1', 'C7', 'D4', 'D5', 'F2', 'F7'};
+  final Set<String> _occupiedSeats = {
+    'A2',
+    'A6',
+    'B4',
+    'C1',
+    'C7',
+    'D4',
+    'D5',
+    'F2',
+    'F7',
+  };
 
   final List<String> _rows = ['A', 'B', 'C', 'D', 'E', 'F'];
   final int _seatsPerRow = 8;
@@ -28,7 +39,9 @@ class _SeatSelectionScreenState extends ConsumerState<SeatSelectionScreen> {
         // Highest tier or first tier
         return tiers.last.price;
       } else if (row == 'C' || row == 'D') {
-        return tiers.length > 1 ? tiers[tiers.length ~/ 2].price : tiers.first.price;
+        return tiers.length > 1
+            ? tiers[tiers.length ~/ 2].price
+            : tiers.first.price;
       } else {
         return tiers.first.price;
       }
@@ -82,7 +95,10 @@ class _SeatSelectionScreenState extends ConsumerState<SeatSelectionScreen> {
                     'Tap any available seat to select.',
                   ),
                   actions: [
-                    TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Got it')),
+                    TextButton(
+                      onPressed: () => Navigator.pop(ctx),
+                      child: const Text('Got it'),
+                    ),
                   ],
                 ),
               );
@@ -91,7 +107,9 @@ class _SeatSelectionScreenState extends ConsumerState<SeatSelectionScreen> {
         ],
       ),
       body: FutureBuilder<List<TicketType>>(
-        future: ref.read(eventRepositoryProvider).getTicketTypes(widget.eventId),
+        future: ref
+            .read(eventRepositoryProvider)
+            .getTicketTypes(widget.eventId),
         builder: (context, snapshot) {
           final tiers = snapshot.data ?? [];
           final totalPrice = _calculateTotal(tiers);
@@ -101,30 +119,51 @@ class _SeatSelectionScreenState extends ConsumerState<SeatSelectionScreen> {
               // Screen / Stage Banner
               Container(
                 width: double.infinity,
-                margin: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                margin: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 16,
+                ),
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 decoration: BoxDecoration(
                   color: Colors.blue.withValues(alpha: 0.15),
-                  borderRadius: const BorderRadius.vertical(bottom: Radius.circular(32)),
+                  borderRadius: const BorderRadius.vertical(
+                    bottom: Radius.circular(32),
+                  ),
                   border: Border.all(color: Colors.blue.shade300, width: 2),
                 ),
                 child: const Center(
                   child: Text(
                     '🎬 STAGE / MAIN SCREEN',
-                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, letterSpacing: 2, color: Colors.blue),
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 2,
+                      color: Colors.blue,
+                    ),
                   ),
                 ),
               ),
 
               // Legend
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 8,
+                ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    _buildLegendItem('Available', Colors.grey.shade300, isBorder: true),
+                    _buildLegendItem(
+                      'Available',
+                      Colors.grey.shade300,
+                      isBorder: true,
+                    ),
                     _buildLegendItem('Selected', Colors.blue, isBorder: false),
-                    _buildLegendItem('Occupied', Colors.grey.shade600, isBorder: false),
+                    _buildLegendItem(
+                      'Occupied',
+                      Colors.grey.shade600,
+                      isBorder: false,
+                    ),
                   ],
                 ),
               ),
@@ -134,7 +173,10 @@ class _SeatSelectionScreenState extends ConsumerState<SeatSelectionScreen> {
               // Seating Grid
               Expanded(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   child: Column(
                     children: _rows.map((row) {
                       String zoneName = 'General';
@@ -157,7 +199,10 @@ class _SeatSelectionScreenState extends ConsumerState<SeatSelectionScreen> {
                               width: 24,
                               child: Text(
                                 row,
-                                style: TextStyle(fontWeight: FontWeight.bold, color: zoneColor),
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: zoneColor,
+                                ),
                               ),
                             ),
                             const SizedBox(width: 8),
@@ -166,8 +211,12 @@ class _SeatSelectionScreenState extends ConsumerState<SeatSelectionScreen> {
                             ...List.generate(_seatsPerRow, (index) {
                               final seatNumber = index + 1;
                               final seatId = '$row$seatNumber';
-                              final isOccupied = _occupiedSeats.contains(seatId);
-                              final isSelected = _selectedSeats.contains(seatId);
+                              final isOccupied = _occupiedSeats.contains(
+                                seatId,
+                              );
+                              final isSelected = _selectedSeats.contains(
+                                seatId,
+                              );
 
                               // Add an aisle gap in the middle
                               final isAisle = index == 3;
@@ -179,20 +228,22 @@ class _SeatSelectionScreenState extends ConsumerState<SeatSelectionScreen> {
                                     child: Container(
                                       width: 32,
                                       height: 32,
-                                      margin: const EdgeInsets.symmetric(horizontal: 3),
+                                      margin: const EdgeInsets.symmetric(
+                                        horizontal: 3,
+                                      ),
                                       decoration: BoxDecoration(
                                         color: isOccupied
                                             ? Colors.grey.shade400
                                             : isSelected
-                                                ? Colors.blue
-                                                : Colors.white,
+                                            ? Colors.blue
+                                            : Colors.white,
                                         borderRadius: BorderRadius.circular(6),
                                         border: Border.all(
                                           color: isSelected
                                               ? Colors.blue.shade700
                                               : isOccupied
-                                                  ? Colors.grey.shade500
-                                                  : Colors.grey.shade400,
+                                              ? Colors.grey.shade500
+                                              : Colors.grey.shade400,
                                           width: 1.5,
                                         ),
                                       ),
@@ -205,8 +256,8 @@ class _SeatSelectionScreenState extends ConsumerState<SeatSelectionScreen> {
                                             color: isOccupied
                                                 ? Colors.grey.shade600
                                                 : isSelected
-                                                    ? Colors.white
-                                                    : Colors.black87,
+                                                ? Colors.white
+                                                : Colors.black87,
                                           ),
                                         ),
                                       ),
@@ -220,14 +271,21 @@ class _SeatSelectionScreenState extends ConsumerState<SeatSelectionScreen> {
                             const SizedBox(width: 8),
                             // Zone Label
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 2,
+                              ),
                               decoration: BoxDecoration(
                                 color: zoneColor.withValues(alpha: 0.15),
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: Text(
                                 zoneName,
-                                style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: zoneColor),
+                                style: TextStyle(
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.bold,
+                                  color: zoneColor,
+                                ),
                               ),
                             ),
                           ],
@@ -244,7 +302,11 @@ class _SeatSelectionScreenState extends ConsumerState<SeatSelectionScreen> {
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.surface,
                   boxShadow: [
-                    BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, -4)),
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, -4),
+                    ),
                   ],
                 ),
                 child: SafeArea(
@@ -261,12 +323,19 @@ class _SeatSelectionScreenState extends ConsumerState<SeatSelectionScreen> {
                                 _selectedSeats.isEmpty
                                     ? 'No seats selected'
                                     : 'Selected (${_selectedSeats.length}): ${_selectedSeats.join(', ')}',
-                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                ),
                               ),
                               const SizedBox(height: 2),
                               Text(
                                 'Total: ${CurrencyHelper.format(totalPrice, currency)}',
-                                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blue),
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.blue,
+                                ),
                               ),
                             ],
                           ),
@@ -277,12 +346,18 @@ class _SeatSelectionScreenState extends ConsumerState<SeatSelectionScreen> {
                                 ? () {
                                     context.push(
                                       '/attendee/event/${widget.eventId}/checkout',
-                                      extra: {'selectedSeats': _selectedSeats.toList()},
+                                      extra: {
+                                        'selectedSeats': _selectedSeats
+                                            .toList(),
+                                      },
                                     );
                                   }
                                 : null,
                             style: ElevatedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 12,
+                              ),
                             ),
                           ),
                         ],

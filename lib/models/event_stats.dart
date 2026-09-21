@@ -14,5 +14,6 @@ abstract class EventStats with _$EventStats {
     @JsonKey(name: 'attendance_rate') @Default(0) num attendanceRate,
   }) = _EventStats;
 
-  factory EventStats.fromJson(Map<String, dynamic> json) => _$EventStatsFromJson(json);
+  factory EventStats.fromJson(Map<String, dynamic> json) =>
+      _$EventStatsFromJson(json);
 }

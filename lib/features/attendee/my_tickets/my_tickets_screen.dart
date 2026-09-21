@@ -30,8 +30,10 @@ class _MyTicketsScreenState extends ConsumerState<MyTicketsScreen> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('Booking: ${booking.id.substring(0, 8)}...',
-                  style: const TextStyle(fontWeight: FontWeight.bold)),
+              Text(
+                'Booking: ${booking.id.substring(0, 8)}...',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
               Text('Amount: \$${booking.totalAmount.toStringAsFixed(2)}'),
               const SizedBox(height: 16),
               TextField(
@@ -45,7 +47,10 @@ class _MyTicketsScreenState extends ConsumerState<MyTicketsScreen> {
             ],
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Cancel'),
+            ),
             FilledButton(
               onPressed: () => Navigator.pop(ctx, controller.text),
               child: const Text('Submit'),
@@ -64,8 +69,10 @@ class _MyTicketsScreenState extends ConsumerState<MyTicketsScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-              content:
-                  Text('Refund request submitted. The organizer will review it.')),
+            content: Text(
+              'Refund request submitted. The organizer will review it.',
+            ),
+          ),
         );
         setState(() {});
       }
@@ -89,7 +96,9 @@ class _MyTicketsScreenState extends ConsumerState<MyTicketsScreen> {
       builder: (ctx) {
         return StatefulBuilder(
           builder: (ctx, setDialogState) => AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
             title: const Row(
               children: [
                 Icon(Icons.swap_horiz, color: Colors.deepPurple),
@@ -154,11 +163,15 @@ class _MyTicketsScreenState extends ConsumerState<MyTicketsScreen> {
               FilledButton.icon(
                 icon: const Icon(Icons.send, size: 16),
                 label: const Text('Transfer'),
-                style: FilledButton.styleFrom(backgroundColor: Colors.deepPurple),
+                style: FilledButton.styleFrom(
+                  backgroundColor: Colors.deepPurple,
+                ),
                 onPressed: () {
                   final email = emailController.text.trim();
                   if (email.isEmpty || !email.contains('@')) {
-                    setDialogState(() => errorText = 'Enter a valid email address');
+                    setDialogState(
+                      () => errorText = 'Enter a valid email address',
+                    );
                     return;
                   }
                   Navigator.pop(ctx, true);
@@ -180,7 +193,14 @@ class _MyTicketsScreenState extends ConsumerState<MyTicketsScreen> {
         const SnackBar(
           content: Row(
             children: [
-              SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)),
+              SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.white,
+                ),
+              ),
               SizedBox(width: 12),
               Text('Processing transfer...'),
             ],
@@ -192,11 +212,13 @@ class _MyTicketsScreenState extends ConsumerState<MyTicketsScreen> {
 
     try {
       final user = ref.read(authControllerProvider).value!;
-      await ref.read(bookingRepositoryProvider).transferTicket(
-        bookingId: booking.id,
-        currentUserId: user.id,
-        recipientEmail: email,
-      );
+      await ref
+          .read(bookingRepositoryProvider)
+          .transferTicket(
+            bookingId: booking.id,
+            currentUserId: user.id,
+            recipientEmail: email,
+          );
       if (mounted) {
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
         ScaffoldMessenger.of(context).showSnackBar(
@@ -227,7 +249,9 @@ class _MyTicketsScreenState extends ConsumerState<MyTicketsScreen> {
     // We don't have full event data in the booking model, so we construct
     // a placeholder invite using available booking fields
     final title = 'EventHub Booking #${booking.id.substring(0, 8)}';
-    final eventStart = DateTime.now().add(const Duration(days: 3)); // placeholder
+    final eventStart = DateTime.now().add(
+      const Duration(days: 3),
+    ); // placeholder
 
     showModalBottomSheet(
       context: context,
@@ -251,10 +275,15 @@ class _MyTicketsScreenState extends ConsumerState<MyTicketsScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            const Text('Add to Calendar / Share',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const Text(
+              'Add to Calendar / Share',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 4),
-            Text(title, style: const TextStyle(color: Colors.grey, fontSize: 13)),
+            Text(
+              title,
+              style: const TextStyle(color: Colors.grey, fontSize: 13),
+            ),
             const SizedBox(height: 20),
             _calendarOption(
               icon: Icons.calendar_today,
@@ -276,7 +305,9 @@ class _MyTicketsScreenState extends ConsumerState<MyTicketsScreen> {
                   // Fallback: copy to clipboard
                   await Clipboard.setData(ClipboardData(text: url));
                   messenger.showSnackBar(
-                    const SnackBar(content: Text('📋 Calendar link copied to clipboard!')),
+                    const SnackBar(
+                      content: Text('📋 Calendar link copied to clipboard!'),
+                    ),
                   );
                 }
               },
@@ -297,7 +328,9 @@ class _MyTicketsScreenState extends ConsumerState<MyTicketsScreen> {
                 final messenger = ScaffoldMessenger.of(context);
                 await Clipboard.setData(ClipboardData(text: shareText));
                 messenger.showSnackBar(
-                  const SnackBar(content: Text('📋 Invite text copied to clipboard!')),
+                  const SnackBar(
+                    content: Text('📋 Invite text copied to clipboard!'),
+                  ),
                 );
               },
             ),
@@ -327,9 +360,14 @@ class _MyTicketsScreenState extends ConsumerState<MyTicketsScreen> {
           children: [
             Icon(icon, color: color, size: 22),
             const SizedBox(width: 12),
-            Text(label,
-                style: TextStyle(
-                    color: color, fontWeight: FontWeight.bold, fontSize: 15)),
+            Text(
+              label,
+              style: TextStyle(
+                color: color,
+                fontWeight: FontWeight.bold,
+                fontSize: 15,
+              ),
+            ),
             const Spacer(),
             Icon(Icons.arrow_forward_ios, size: 14, color: color),
           ],
@@ -359,27 +397,39 @@ class _MyTicketsScreenState extends ConsumerState<MyTicketsScreen> {
             icon: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(currency.symbol,
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                Text(
+                  currency.symbol,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
                 const Icon(Icons.arrow_drop_down, size: 18),
               ],
             ),
             tooltip: 'Change Currency',
-            onSelected: (c) => ref.read(currencyProvider.notifier).setCurrency(c),
+            onSelected: (c) =>
+                ref.read(currencyProvider.notifier).setCurrency(c),
             itemBuilder: (_) => AppCurrency.values
-                .map((c) => PopupMenuItem(
-                      value: c,
-                      child: Text('${c.symbol} ${c.code}',
-                          style: TextStyle(
-                              fontWeight: currency == c
-                                  ? FontWeight.bold
-                                  : FontWeight.normal)),
-                    ))
+                .map(
+                  (c) => PopupMenuItem(
+                    value: c,
+                    child: Text(
+                      '${c.symbol} ${c.code}',
+                      style: TextStyle(
+                        fontWeight: currency == c
+                            ? FontWeight.bold
+                            : FontWeight.normal,
+                      ),
+                    ),
+                  ),
+                )
                 .toList(),
           ),
           IconButton(
             icon: const Icon(Icons.logout),
-            onPressed: () => ref.read(authControllerProvider.notifier).signOut(),
+            onPressed: () =>
+                ref.read(authControllerProvider.notifier).signOut(),
           ),
         ],
       ),
@@ -400,11 +450,16 @@ class _MyTicketsScreenState extends ConsumerState<MyTicketsScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.confirmation_number_outlined,
-                      size: 64, color: Colors.grey),
+                  const Icon(
+                    Icons.confirmation_number_outlined,
+                    size: 64,
+                    color: Colors.grey,
+                  ),
                   const SizedBox(height: 16),
-                  const Text('No tickets booked yet.',
-                      style: TextStyle(fontSize: 16)),
+                  const Text(
+                    'No tickets booked yet.',
+                    style: TextStyle(fontSize: 16),
+                  ),
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () => context.go('/attendee/browse'),
@@ -442,7 +497,10 @@ class _MyTicketsScreenState extends ConsumerState<MyTicketsScreen> {
                   ),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 4,
+                    vertical: 4,
+                  ),
                   child: ListTile(
                     leading: Container(
                       width: 48,
@@ -461,23 +519,28 @@ class _MyTicketsScreenState extends ConsumerState<MyTicketsScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const SizedBox(height: 4),
-                        Row(children: [
-                          Container(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: statusColor.withValues(alpha: 0.15),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              b.status.toUpperCase(),
-                              style: TextStyle(
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: statusColor.withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                b.status.toUpperCase(),
+                                style: TextStyle(
                                   color: statusColor,
                                   fontSize: 11,
-                                  fontWeight: FontWeight.bold),
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                             ),
-                          ),
-                        ]),
+                          ],
+                        ),
                         const SizedBox(height: 2),
                         Text(
                           'Qty: ${b.quantity}  •  ${CurrencyHelper.format(b.totalAmount.toDouble(), currency)}',
@@ -487,7 +550,8 @@ class _MyTicketsScreenState extends ConsumerState<MyTicketsScreen> {
                     trailing: PopupMenuButton<String>(
                       icon: const Icon(Icons.more_vert),
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                       onSelected: (action) {
                         switch (action) {
                           case 'qr':
@@ -505,46 +569,71 @@ class _MyTicketsScreenState extends ConsumerState<MyTicketsScreen> {
                       itemBuilder: (_) => [
                         const PopupMenuItem(
                           value: 'qr',
-                          child: Row(children: [
-                            Icon(Icons.qr_code_2, size: 20),
-                            SizedBox(width: 8),
-                            Text('View QR Ticket'),
-                          ]),
+                          child: Row(
+                            children: [
+                              Icon(Icons.qr_code_2, size: 20),
+                              SizedBox(width: 8),
+                              Text('View QR Ticket'),
+                            ],
+                          ),
                         ),
                         const PopupMenuItem(
                           value: 'calendar',
-                          child: Row(children: [
-                            Icon(Icons.calendar_month, size: 20, color: Colors.blue),
-                            SizedBox(width: 8),
-                            Text('Add to Calendar'),
-                          ]),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.calendar_month,
+                                size: 20,
+                                color: Colors.blue,
+                              ),
+                              SizedBox(width: 8),
+                              Text('Add to Calendar'),
+                            ],
+                          ),
                         ),
                         const PopupMenuItem(
                           value: 'rate',
-                          child: Row(children: [
-                            Icon(Icons.star_outline, size: 20, color: Colors.amber),
-                            SizedBox(width: 8),
-                            Text('Rate Event'),
-                          ]),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.star_outline,
+                                size: 20,
+                                color: Colors.amber,
+                              ),
+                              SizedBox(width: 8),
+                              Text('Rate Event'),
+                            ],
+                          ),
                         ),
                         if (canTransfer)
                           const PopupMenuItem(
                             value: 'transfer',
-                            child: Row(children: [
-                              Icon(Icons.swap_horiz, size: 20,
-                                  color: Colors.deepPurple),
-                              SizedBox(width: 8),
-                              Text('Transfer Ticket'),
-                            ]),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.swap_horiz,
+                                  size: 20,
+                                  color: Colors.deepPurple,
+                                ),
+                                SizedBox(width: 8),
+                                Text('Transfer Ticket'),
+                              ],
+                            ),
                           ),
                         if (canRefund)
                           const PopupMenuItem(
                             value: 'refund',
-                            child: Row(children: [
-                              Icon(Icons.money_off, size: 20, color: Colors.orange),
-                              SizedBox(width: 8),
-                              Text('Request Refund'),
-                            ]),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.money_off,
+                                  size: 20,
+                                  color: Colors.orange,
+                                ),
+                                SizedBox(width: 8),
+                                Text('Request Refund'),
+                              ],
+                            ),
                           ),
                       ],
                     ),

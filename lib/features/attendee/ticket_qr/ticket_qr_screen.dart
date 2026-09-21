@@ -10,7 +10,8 @@ class TicketQrScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     // Generate QR payload
     // Format: EVT:{event_id}|BK:{booking_id}|T:{qr_token}
-    final qrData = 'EVT:${booking.eventId}|BK:${booking.id}|T:${booking.qrToken ?? "no_token"}';
+    final qrData =
+        'EVT:${booking.eventId}|BK:${booking.id}|T:${booking.qrToken ?? "no_token"}';
 
     return Scaffold(
       appBar: AppBar(title: const Text('Your Ticket')),
@@ -36,7 +37,7 @@ class TicketQrScreen extends StatelessWidget {
                       color: Colors.black12,
                       blurRadius: 10,
                       offset: Offset(0, 5),
-                    )
+                    ),
                   ],
                 ),
                 child: QrImageView(
@@ -58,8 +59,8 @@ class TicketQrScreen extends StatelessWidget {
               Text(
                 'Booking ID: ${booking.id}',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
               ),
             ],
           ),

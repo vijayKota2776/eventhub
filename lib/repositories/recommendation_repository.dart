@@ -36,27 +36,33 @@ class RecommendationRepository {
 
       // Step 2: Query events matching those categories or cities
       if (categories.isNotEmpty || cities.isNotEmpty) {
-        final bookedEventIds = (await _client
-                .from('bookings')
-                .select('event_id')
-                .eq('user_id', userId))
-            .map((b) => b['event_id'] as String)
-            .toList();
+        final bookedEventIds =
+            (await _client
+                    .from('bookings')
+                    .select('event_id')
+                    .eq('user_id', userId))
+                .map((b) => b['event_id'] as String)
+                .toList();
 
-        dynamic filter = _client.from('events').select().eq('status', 'published');
+        dynamic filter = _client
+            .from('events')
+            .select()
+            .eq('status', 'published');
 
         if (bookedEventIds.isNotEmpty) {
           filter = filter.not('id', 'in', '(${bookedEventIds.join(',')})');
         }
 
-        final results = await filter.order('total_sold', ascending: false).limit(6);
-        final events =
-            (results as List).map((e) => Event.fromJson(e)).toList();
+        final results = await filter
+            .order('total_sold', ascending: false)
+            .limit(6);
+        final events = (results as List).map((e) => Event.fromJson(e)).toList();
 
         // Filter client-side for matching category/city
         final matched = events
-            .where((e) =>
-                categories.contains(e.category) || cities.contains(e.city))
+            .where(
+              (e) => categories.contains(e.category) || cities.contains(e.city),
+            )
             .toList();
 
         if (matched.isNotEmpty) return matched;

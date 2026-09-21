@@ -120,7 +120,10 @@ class _NotificationSettingsScreenState
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
-                      allEnabled ? '🔕 All notifications off' : '🔔 All notifications on'),
+                    allEnabled
+                        ? '🔕 All notifications off'
+                        : '🔔 All notifications on',
+                  ),
                   duration: const Duration(seconds: 2),
                 ),
               );
@@ -178,8 +181,9 @@ class _NotificationSettingsScreenState
                             ? 'You won\'t receive any alerts from EventHub.'
                             : 'You\'ll receive timely updates for important events.',
                         style: TextStyle(
-                            fontSize: 12,
-                            color: colorScheme.onSurfaceVariant),
+                          fontSize: 12,
+                          color: colorScheme.onSurfaceVariant,
+                        ),
                       ),
                     ],
                   ),
@@ -219,7 +223,8 @@ class _NotificationSettingsScreenState
                   elevation: 1,
                   margin: const EdgeInsets.only(bottom: 16),
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14)),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
                   child: Column(
                     children: items.asMap().entries.map((entry) {
                       final idx = entry.key;
@@ -234,19 +239,25 @@ class _NotificationSettingsScreenState
                             value: isEnabled,
                             onChanged: (val) =>
                                 setState(() => _prefs[key] = val),
-                            title: Text(item['label']!,
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 14)),
-                            subtitle: Text(item['sub']!,
-                                style: const TextStyle(fontSize: 12)),
+                            title: Text(
+                              item['label']!,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 14,
+                              ),
+                            ),
+                            subtitle: Text(
+                              item['sub']!,
+                              style: const TextStyle(fontSize: 12),
+                            ),
                             activeThumbColor: color,
                             contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 4),
+                              horizontal: 16,
+                              vertical: 4,
+                            ),
                           ),
                           if (!isLast)
-                            const Divider(
-                                height: 1, indent: 16, endIndent: 16),
+                            const Divider(height: 1, indent: 16, endIndent: 16),
                         ],
                       );
                     }).toList(),
@@ -261,7 +272,9 @@ class _NotificationSettingsScreenState
             child: Text(
               'Preferences are saved automatically.',
               style: TextStyle(
-                  fontSize: 12, color: colorScheme.onSurfaceVariant),
+                fontSize: 12,
+                color: colorScheme.onSurfaceVariant,
+              ),
             ),
           ),
           const SizedBox(height: 24),
@@ -281,7 +294,8 @@ class _NotificationSettingsScreenState
             style: FilledButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 14),
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16)),
+                borderRadius: BorderRadius.circular(16),
+              ),
             ),
           ),
           const SizedBox(height: 32),

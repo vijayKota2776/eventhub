@@ -19,5 +19,6 @@ abstract class Booking with _$Booking {
     @JsonKey(name: 'created_at') DateTime? createdAt,
   }) = _Booking;
 
-  factory Booking.fromJson(Map<String, dynamic> json) => _$BookingFromJson(json);
+  factory Booking.fromJson(Map<String, dynamic> json) =>
+      _$BookingFromJson(json);
 }

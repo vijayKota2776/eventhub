@@ -25,12 +25,18 @@ class _AdminApprovalsViewState extends ConsumerState<AdminApprovalsView> {
 
   Future<void> _updateStatus(String eventId, String status) async {
     try {
-      await ref.read(eventRepositoryProvider).updateEventStatus(eventId, status);
+      await ref
+          .read(eventRepositoryProvider)
+          .updateEventStatus(eventId, status);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(status == 'published' ? '✅ Event Approved!' : '❌ Event Rejected'),
-            backgroundColor: status == 'published' ? Colors.green : Colors.redAccent,
+            content: Text(
+              status == 'published' ? '✅ Event Approved!' : '❌ Event Rejected',
+            ),
+            backgroundColor: status == 'published'
+                ? Colors.green
+                : Colors.redAccent,
           ),
         );
         setState(() {
@@ -39,9 +45,8 @@ class _AdminApprovalsViewState extends ConsumerState<AdminApprovalsView> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error updating event: $e')),
-        );
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Error updating event: $e')));
       }
     }
   }
@@ -64,7 +69,11 @@ class _AdminApprovalsViewState extends ConsumerState<AdminApprovalsView> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.check_circle_outline, size: 64, color: Colors.green.shade400),
+                Icon(
+                  Icons.check_circle_outline,
+                  size: 64,
+                  color: Colors.green.shade400,
+                ),
                 const SizedBox(height: 16),
                 const Text(
                   'No pending approvals!',
@@ -94,7 +103,9 @@ class _AdminApprovalsViewState extends ConsumerState<AdminApprovalsView> {
               return Card(
                 elevation: 2,
                 margin: const EdgeInsets.only(bottom: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Column(
@@ -106,14 +117,20 @@ class _AdminApprovalsViewState extends ConsumerState<AdminApprovalsView> {
                           Expanded(
                             child: Text(
                               event.title,
-                              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
                             decoration: BoxDecoration(
-                              color: event.status == 'rejected' 
-                                  ? Colors.red.withValues(alpha: 0.2) 
+                              color: event.status == 'rejected'
+                                  ? Colors.red.withValues(alpha: 0.2)
                                   : Colors.orange.withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(20),
                             ),
@@ -122,7 +139,9 @@ class _AdminApprovalsViewState extends ConsumerState<AdminApprovalsView> {
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
-                                color: event.status == 'rejected' ? Colors.red : Colors.orange,
+                                color: event.status == 'rejected'
+                                    ? Colors.red
+                                    : Colors.orange,
                               ),
                             ),
                           ),
@@ -131,11 +150,22 @@ class _AdminApprovalsViewState extends ConsumerState<AdminApprovalsView> {
                       const SizedBox(height: 8),
                       Row(
                         children: [
-                          const Icon(Icons.category, size: 16, color: Colors.grey),
+                          const Icon(
+                            Icons.category,
+                            size: 16,
+                            color: Colors.grey,
+                          ),
                           const SizedBox(width: 6),
-                          Text(event.category, style: const TextStyle(color: Colors.grey)),
+                          Text(
+                            event.category,
+                            style: const TextStyle(color: Colors.grey),
+                          ),
                           const SizedBox(width: 16),
-                          const Icon(Icons.location_on, size: 16, color: Colors.grey),
+                          const Icon(
+                            Icons.location_on,
+                            size: 16,
+                            color: Colors.grey,
+                          ),
                           const SizedBox(width: 6),
                           Expanded(
                             child: Text(
@@ -146,7 +176,8 @@ class _AdminApprovalsViewState extends ConsumerState<AdminApprovalsView> {
                           ),
                         ],
                       ),
-                      if (event.description != null && event.description!.isNotEmpty) ...[
+                      if (event.description != null &&
+                          event.description!.isNotEmpty) ...[
                         const SizedBox(height: 8),
                         Text(
                           event.description!,
@@ -161,15 +192,25 @@ class _AdminApprovalsViewState extends ConsumerState<AdminApprovalsView> {
                         children: [
                           OutlinedButton.icon(
                             icon: const Icon(Icons.close, color: Colors.red),
-                            label: const Text('Reject', style: TextStyle(color: Colors.red)),
-                            onPressed: () => _updateStatus(event.id, 'rejected'),
+                            label: const Text(
+                              'Reject',
+                              style: TextStyle(color: Colors.red),
+                            ),
+                            onPressed: () =>
+                                _updateStatus(event.id, 'rejected'),
                           ),
                           const SizedBox(width: 12),
                           ElevatedButton.icon(
                             icon: const Icon(Icons.check, color: Colors.white),
-                            label: const Text('Approve', style: TextStyle(color: Colors.white)),
-                            style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-                            onPressed: () => _updateStatus(event.id, 'published'),
+                            label: const Text(
+                              'Approve',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green,
+                            ),
+                            onPressed: () =>
+                                _updateStatus(event.id, 'published'),
                           ),
                         ],
                       ),

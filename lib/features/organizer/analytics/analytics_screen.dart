@@ -18,7 +18,9 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('Event Analytics')),
       body: FutureBuilder<EventStats>(
-        future: ref.read(analyticsRepositoryProvider).getEventStats(widget.eventId),
+        future: ref
+            .read(analyticsRepositoryProvider)
+            .getEventStats(widget.eventId),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -26,7 +28,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
           if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           }
-          
+
           final stats = snapshot.data;
           if (stats == null) {
             return const Center(child: Text('No stats available.'));
@@ -40,29 +42,52 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(stats.title, style: Theme.of(context).textTheme.headlineMedium),
+                Text(
+                  stats.title,
+                  style: Theme.of(context).textTheme.headlineMedium,
+                ),
                 const SizedBox(height: 24),
-                
+
                 Row(
                   children: [
-                    Expanded(child: _buildStatCard('Revenue', '\$${stats.revenue.toStringAsFixed(2)}')),
+                    Expanded(
+                      child: _buildStatCard(
+                        'Revenue',
+                        '\$${stats.revenue.toStringAsFixed(2)}',
+                      ),
+                    ),
                     const SizedBox(width: 16),
-                    Expanded(child: _buildStatCard('Tickets Sold', '${stats.ticketsSold}')),
+                    Expanded(
+                      child: _buildStatCard(
+                        'Tickets Sold',
+                        '${stats.ticketsSold}',
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 16),
                 Row(
                   children: [
-                    Expanded(child: _buildStatCard('Checked In', '${stats.attended}')),
+                    Expanded(
+                      child: _buildStatCard('Checked In', '${stats.attended}'),
+                    ),
                     const SizedBox(width: 16),
-                    Expanded(child: _buildStatCard('Attendance', '${stats.attendanceRate}%')),
+                    Expanded(
+                      child: _buildStatCard(
+                        'Attendance',
+                        '${stats.attendanceRate}%',
+                      ),
+                    ),
                   ],
                 ),
-                
+
                 const SizedBox(height: 48),
-                Text('Attendance Breakdown', style: Theme.of(context).textTheme.titleLarge),
+                Text(
+                  'Attendance Breakdown',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
                 const SizedBox(height: 16),
-                
+
                 if (hasData)
                   SizedBox(
                     height: 250,
@@ -74,14 +99,22 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                             value: stats.attended.toDouble(),
                             title: '${stats.attended}\nAttended',
                             radius: 100,
-                            titleStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
+                            titleStyle: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
                           ),
                           PieChartSectionData(
                             color: Colors.grey.shade400,
                             value: nonAttended.toDouble(),
                             title: '$nonAttended\nAbsent',
                             radius: 100,
-                            titleStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black87),
+                            titleStyle: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
                           ),
                         ],
                         sectionsSpace: 2,
@@ -90,7 +123,9 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                     ),
                   )
                 else
-                  const Center(child: Text('No tickets sold yet to show breakdown.')),
+                  const Center(
+                    child: Text('No tickets sold yet to show breakdown.'),
+                  ),
               ],
             ),
           );
@@ -107,9 +142,15 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            Text(title, style: const TextStyle(color: Colors.grey, fontSize: 14)),
+            Text(
+              title,
+              style: const TextStyle(color: Colors.grey, fontSize: 14),
+            ),
             const SizedBox(height: 8),
-            Text(value, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+            Text(
+              value,
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
           ],
         ),
       ),

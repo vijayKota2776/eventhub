@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -9,8 +10,15 @@ import 'package:eventhub/repositories/event_repository.dart';
 import 'package:intl/intl.dart';
 
 const _kCategories = [
-  'Music', 'Technology', 'Sports', 'Food', 'Art',
-  'Business', 'Education', 'Health', 'Other',
+  'Music',
+  'Technology',
+  'Sports',
+  'Food',
+  'Art',
+  'Business',
+  'Education',
+  'Health',
+  'Other',
 ];
 
 class CreateEventScreen extends ConsumerStatefulWidget {
@@ -92,9 +100,9 @@ class _CreateEventScreenState extends ConsumerState<CreateEventScreen> {
   }
 
   void _removeBanner() => setState(() {
-        _bannerBytes = null;
-        _bannerExtension = null;
-      });
+    _bannerBytes = null;
+    _bannerExtension = null;
+  });
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate() ||
@@ -102,7 +110,8 @@ class _CreateEventScreenState extends ConsumerState<CreateEventScreen> {
         _endAt == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            content: Text('Please fill all fields and select dates.')),
+          content: Text('Please fill all fields and select dates.'),
+        ),
       );
       return;
     }
@@ -117,7 +126,9 @@ class _CreateEventScreenState extends ConsumerState<CreateEventScreen> {
       if (_bannerBytes != null) {
         setState(() => _isUploadingImage = true);
         try {
-          bannerUrl = await ref.read(eventRepositoryProvider).uploadBannerImage(
+          bannerUrl = await ref
+              .read(eventRepositoryProvider)
+              .uploadBannerImage(
                 organizerId: user.id,
                 bytes: _bannerBytes!,
                 extension: _bannerExtension ?? 'jpeg',
@@ -175,7 +186,13 @@ class _CreateEventScreenState extends ConsumerState<CreateEventScreen> {
     );
     if (time == null) return;
 
-    final dt = DateTime(date.year, date.month, date.day, time.hour, time.minute);
+    final dt = DateTime(
+      date.year,
+      date.month,
+      date.day,
+      time.hour,
+      time.minute,
+    );
     setState(() => isStart ? _startAt = dt : _endAt = dt);
   }
 
@@ -202,8 +219,9 @@ class _CreateEventScreenState extends ConsumerState<CreateEventScreen> {
                     color: colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                        color: colorScheme.outline.withValues(alpha: 0.4),
-                        width: 1.5),
+                      color: colorScheme.outline.withValues(alpha: 0.4),
+                      width: 1.5,
+                    ),
                     image: _bannerBytes != null
                         ? DecorationImage(
                             image: MemoryImage(_bannerBytes!),
@@ -219,11 +237,15 @@ class _CreateEventScreenState extends ConsumerState<CreateEventScreen> {
                               right: 8,
                               child: CircleAvatar(
                                 radius: 16,
-                                backgroundColor:
-                                    Colors.black.withValues(alpha: 0.55),
+                                backgroundColor: Colors.black.withValues(
+                                  alpha: 0.55,
+                                ),
                                 child: IconButton(
-                                  icon: const Icon(Icons.close,
-                                      size: 16, color: Colors.white),
+                                  icon: const Icon(
+                                    Icons.close,
+                                    size: 16,
+                                    color: Colors.white,
+                                  ),
                                   padding: EdgeInsets.zero,
                                   onPressed: _removeBanner,
                                 ),
@@ -236,18 +258,27 @@ class _CreateEventScreenState extends ConsumerState<CreateEventScreen> {
                       : Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.add_photo_alternate_outlined,
-                                size: 40,
-                                color: colorScheme.onSurfaceVariant),
+                            Icon(
+                              Icons.add_photo_alternate_outlined,
+                              size: 40,
+                              color: colorScheme.onSurfaceVariant,
+                            ),
                             const SizedBox(height: 8),
-                            Text('Tap to add event banner',
-                                style: TextStyle(
-                                    color: colorScheme.onSurfaceVariant)),
-                            Text('(Optional — gallery or camera)',
-                                style: TextStyle(
-                                    fontSize: 11,
-                                    color: colorScheme.onSurfaceVariant
-                                        .withValues(alpha: 0.6))),
+                            Text(
+                              'Tap to add event banner',
+                              style: TextStyle(
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                            Text(
+                              '(Optional — gallery or camera)',
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: colorScheme.onSurfaceVariant.withValues(
+                                  alpha: 0.6,
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                 ),
@@ -261,7 +292,8 @@ class _CreateEventScreenState extends ConsumerState<CreateEventScreen> {
                   labelText: 'Event Title *',
                   prefixIcon: const Icon(Icons.title),
                   border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12)),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
                 validator: (v) =>
                     (v == null || v.trim().isEmpty) ? 'Required' : null,
@@ -275,7 +307,8 @@ class _CreateEventScreenState extends ConsumerState<CreateEventScreen> {
                   labelText: 'Description',
                   prefixIcon: const Icon(Icons.description_outlined),
                   border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12)),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                   alignLabelWithHint: true,
                 ),
                 maxLines: 3,
@@ -293,7 +326,8 @@ class _CreateEventScreenState extends ConsumerState<CreateEventScreen> {
                         labelText: 'Venue *',
                         prefixIcon: const Icon(Icons.place_outlined),
                         border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12)),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
                       validator: (v) =>
                           (v == null || v.trim().isEmpty) ? 'Required' : null,
@@ -307,7 +341,8 @@ class _CreateEventScreenState extends ConsumerState<CreateEventScreen> {
                       decoration: InputDecoration(
                         labelText: 'City *',
                         border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12)),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
                       validator: (v) =>
                           (v == null || v.trim().isEmpty) ? 'Required' : null,
@@ -324,7 +359,8 @@ class _CreateEventScreenState extends ConsumerState<CreateEventScreen> {
                   labelText: 'Category',
                   prefixIcon: const Icon(Icons.category_outlined),
                   border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12)),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
                 items: _kCategories
                     .map((c) => DropdownMenuItem(value: c, child: Text(c)))
@@ -349,7 +385,8 @@ class _CreateEventScreenState extends ConsumerState<CreateEventScreen> {
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12)),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                         foregroundColor: _startAt != null
                             ? colorScheme.primary
                             : colorScheme.onSurfaceVariant,
@@ -371,7 +408,8 @@ class _CreateEventScreenState extends ConsumerState<CreateEventScreen> {
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12)),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                         foregroundColor: _endAt != null
                             ? colorScheme.primary
                             : colorScheme.onSurfaceVariant,
@@ -393,14 +431,22 @@ class _CreateEventScreenState extends ConsumerState<CreateEventScreen> {
                         width: 20,
                         height: 20,
                         child: CircularProgressIndicator(
-                            color: Colors.white, strokeWidth: 2))
-                    : const Text('Create Event',
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
+                      )
+                    : const Text(
+                        'Create Event',
                         style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold)),
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                 style: FilledButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16)),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                 ),
                 onPressed: _isLoading ? null : _submit,
               ),

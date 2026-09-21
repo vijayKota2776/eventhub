@@ -31,7 +31,9 @@ class _TicketTiersScreenState extends ConsumerState<TicketTiersScreen> {
               children: [
                 TextField(
                   controller: nameController,
-                  decoration: const InputDecoration(labelText: 'Tier Name (e.g. VIP)'),
+                  decoration: const InputDecoration(
+                    labelText: 'Tier Name (e.g. VIP)',
+                  ),
                 ),
                 TextField(
                   controller: priceController,
@@ -40,7 +42,9 @@ class _TicketTiersScreenState extends ConsumerState<TicketTiersScreen> {
                 ),
                 TextField(
                   controller: quantityController,
-                  decoration: const InputDecoration(labelText: 'Total Quantity'),
+                  decoration: const InputDecoration(
+                    labelText: 'Total Quantity',
+                  ),
                   keyboardType: TextInputType.number,
                 ),
               ],
@@ -68,14 +72,17 @@ class _TicketTiersScreenState extends ConsumerState<TicketTiersScreen> {
                 );
 
                 try {
-                  await ref.read(eventRepositoryProvider).createTicketType(newTicket);
+                  await ref
+                      .read(eventRepositoryProvider)
+                      .createTicketType(newTicket);
                   if (context.mounted) {
                     context.pop();
                     setState(() {}); // Refresh list
                   }
                 } catch (e) {
                   if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+                    ScaffoldMessenger.of(context)
+                        .showSnackBar(SnackBar(content: Text('Error: $e')));
                   }
                 }
               },
@@ -92,7 +99,9 @@ class _TicketTiersScreenState extends ConsumerState<TicketTiersScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('Manage Ticket Tiers')),
       body: FutureBuilder<List<TicketType>>(
-        future: ref.read(eventRepositoryProvider).getTicketTypes(widget.eventId),
+        future: ref
+            .read(eventRepositoryProvider)
+            .getTicketTypes(widget.eventId),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());

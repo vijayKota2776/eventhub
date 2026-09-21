@@ -11,10 +11,21 @@ class RefundRequest {
   final String reason;
   final String status;
   final DateTime createdAt;
-  RefundRequest({required this.id, required this.bookingId, required this.amount, required this.reason, required this.status, required this.createdAt});
+  RefundRequest({
+    required this.id,
+    required this.bookingId,
+    required this.amount,
+    required this.reason,
+    required this.status,
+    required this.createdAt,
+  });
   factory RefundRequest.fromJson(Map<String, dynamic> j) => RefundRequest(
-    id: j['id'], bookingId: j['booking_id'], amount: double.parse(j['amount'].toString()),
-    reason: j['reason'] ?? '', status: j['status'], createdAt: DateTime.parse(j['created_at']),
+    id: j['id'],
+    bookingId: j['booking_id'],
+    amount: double.parse(j['amount'].toString()),
+    reason: j['reason'] ?? '',
+    status: j['status'],
+    createdAt: DateTime.parse(j['created_at']),
   );
 }
 
@@ -26,7 +37,8 @@ class PromoManagerScreen extends ConsumerStatefulWidget {
   ConsumerState<PromoManagerScreen> createState() => _PromoManagerScreenState();
 }
 
-class _PromoManagerScreenState extends ConsumerState<PromoManagerScreen> with SingleTickerProviderStateMixin {
+class _PromoManagerScreenState extends ConsumerState<PromoManagerScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabs;
 
   @override
@@ -87,7 +99,9 @@ class _PromoCodesTabState extends ConsumerState<_PromoCodesTab> {
   Future<void> _load() async {
     setState(() => _loading = true);
     try {
-      final res = await ref.read(eventRepositoryProvider).getPromoCodes(widget.eventId);
+      final res = await ref
+          .read(eventRepositoryProvider)
+          .getPromoCodes(widget.eventId);
       if (mounted) setState(() => _codes = res);
     } finally {
       if (mounted) setState(() => _loading = false);
@@ -110,15 +124,31 @@ class _PromoCodesTabState extends ConsumerState<_PromoCodesTab> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                TextField(controller: codeCtrl,
-                    decoration: const InputDecoration(labelText: 'Code', hintText: 'e.g. EARLYBIRD20', border: OutlineInputBorder())),
+                TextField(
+                  controller: codeCtrl,
+                  decoration: const InputDecoration(
+                    labelText: 'Code',
+                    hintText: 'e.g. EARLYBIRD20',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
                 const SizedBox(height: 12),
-                Row(children: [
-                  const Text('Type: '),
-                  ChoiceChip(label: const Text('Flat \$'), selected: !isPct, onSelected: (_) => setS(() => isPct = false)),
-                  const SizedBox(width: 8),
-                  ChoiceChip(label: const Text('Percent %'), selected: isPct, onSelected: (_) => setS(() => isPct = true)),
-                ]),
+                Row(
+                  children: [
+                    const Text('Type: '),
+                    ChoiceChip(
+                      label: const Text('Flat \$'),
+                      selected: !isPct,
+                      onSelected: (_) => setS(() => isPct = false),
+                    ),
+                    const SizedBox(width: 8),
+                    ChoiceChip(
+                      label: const Text('Percent %'),
+                      selected: isPct,
+                      onSelected: (_) => setS(() => isPct = true),
+                    ),
+                  ],
+                ),
                 const SizedBox(height: 12),
                 TextField(
                   controller: isPct ? pctCtrl : amtCtrl,
@@ -129,24 +159,41 @@ class _PromoCodesTabState extends ConsumerState<_PromoCodesTab> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                TextField(controller: maxCtrl, keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(labelText: 'Max Uses (leave empty = unlimited)', border: OutlineInputBorder())),
+                TextField(
+                  controller: maxCtrl,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                    labelText: 'Max Uses (leave empty = unlimited)',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
               ],
             ),
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Cancel'),
+            ),
             FilledButton(
               onPressed: () async {
                 if (codeCtrl.text.trim().isEmpty) return;
                 Navigator.pop(ctx);
-                await ref.read(eventRepositoryProvider).createPromoCode(
-                  eventId: widget.eventId,
-                  code: codeCtrl.text.trim().toUpperCase(),
-                  discountAmount: !isPct && amtCtrl.text.isNotEmpty ? double.tryParse(amtCtrl.text) : null,
-                  discountPercent: isPct && pctCtrl.text.isNotEmpty ? double.tryParse(pctCtrl.text) : null,
-                  maxUses: maxCtrl.text.isNotEmpty ? int.tryParse(maxCtrl.text) : null,
-                );
+                await ref
+                    .read(eventRepositoryProvider)
+                    .createPromoCode(
+                      eventId: widget.eventId,
+                      code: codeCtrl.text.trim().toUpperCase(),
+                      discountAmount: !isPct && amtCtrl.text.isNotEmpty
+                          ? double.tryParse(amtCtrl.text)
+                          : null,
+                      discountPercent: isPct && pctCtrl.text.isNotEmpty
+                          ? double.tryParse(pctCtrl.text)
+                          : null,
+                      maxUses: maxCtrl.text.isNotEmpty
+                          ? int.tryParse(maxCtrl.text)
+                          : null,
+                    );
                 _load();
               },
               child: const Text('Create'),
@@ -163,29 +210,43 @@ class _PromoCodesTabState extends ConsumerState<_PromoCodesTab> {
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : _codes.isEmpty
-              ? Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
                   const Icon(Icons.local_offer, size: 64, color: Colors.grey),
                   const SizedBox(height: 16),
                   const Text('No promo codes yet'),
-                ]))
-              : ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: _codes.length,
-                  itemBuilder: (_, i) {
-                    final c = _codes[i];
-                    final discount = c['discount_percent'] != null
-                        ? '${c['discount_percent']}% off'
-                        : '\$${c['discount_amount']} off';
-                    final usage = '${c['uses']}/${c['max_uses'] ?? '∞'} uses';
-                    return Card(
-                      child: ListTile(
-                        leading: const Icon(Icons.local_offer, color: Colors.purple),
-                        title: Text(c['code'], style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1)),
-                        subtitle: Text('$discount  •  $usage'),
+                ],
+              ),
+            )
+          : ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: _codes.length,
+              itemBuilder: (_, i) {
+                final c = _codes[i];
+                final discount = c['discount_percent'] != null
+                    ? '${c['discount_percent']}% off'
+                    : '\$${c['discount_amount']} off';
+                final usage = '${c['uses']}/${c['max_uses'] ?? '∞'} uses';
+                return Card(
+                  child: ListTile(
+                    leading: const Icon(
+                      Icons.local_offer,
+                      color: Colors.purple,
+                    ),
+                    title: Text(
+                      c['code'],
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1,
                       ),
-                    );
-                  },
-                ),
+                    ),
+                    subtitle: Text('$discount  •  $usage'),
+                  ),
+                );
+              },
+            ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _showCreateDialog,
         icon: const Icon(Icons.add),
@@ -217,18 +278,24 @@ class _RefundsTabState extends ConsumerState<_RefundsTab> {
   Future<void> _load() async {
     setState(() => _loading = true);
     try {
-      final res = await ref.read(bookingRepositoryProvider).getRefundRequestsForEvent(widget.eventId);
-      if (mounted) setState(() => _refunds = res.map(RefundRequest.fromJson).toList());
+      final res = await ref
+          .read(bookingRepositoryProvider)
+          .getRefundRequestsForEvent(widget.eventId);
+      if (mounted)
+        setState(() => _refunds = res.map(RefundRequest.fromJson).toList());
     } finally {
       if (mounted) setState(() => _loading = false);
     }
   }
 
   Future<void> _update(String refundId, String status) async {
-    await ref.read(bookingRepositoryProvider).updateRefundStatus(refundId, status);
+    await ref
+        .read(bookingRepositoryProvider)
+        .updateRefundStatus(refundId, status);
     _load();
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Refund $status')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Refund $status')));
     }
   }
 
@@ -236,11 +303,16 @@ class _RefundsTabState extends ConsumerState<_RefundsTab> {
   Widget build(BuildContext context) {
     if (_loading) return const Center(child: CircularProgressIndicator());
     if (_refunds.isEmpty) {
-      return const Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-        Icon(Icons.check_circle, size: 64, color: Colors.green),
-        SizedBox(height: 16),
-        Text('No pending refund requests'),
-      ]));
+      return const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.check_circle, size: 64, color: Colors.green),
+            SizedBox(height: 16),
+            Text('No pending refund requests'),
+          ],
+        ),
+      );
     }
 
     return ListView.builder(
@@ -248,43 +320,77 @@ class _RefundsTabState extends ConsumerState<_RefundsTab> {
       itemCount: _refunds.length,
       itemBuilder: (_, i) {
         final r = _refunds[i];
-        Color statusColor = r.status == 'pending' ? Colors.orange : r.status == 'approved' ? Colors.green : Colors.red;
+        Color statusColor = r.status == 'pending'
+            ? Colors.orange
+            : r.status == 'approved'
+            ? Colors.green
+            : Colors.red;
         return Card(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                Text('Booking #${r.bookingId.substring(0, 8)}', style: const TextStyle(fontWeight: FontWeight.bold)),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                  decoration: BoxDecoration(color: statusColor.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(8)),
-                  child: Text(r.status.toUpperCase(), style: TextStyle(color: statusColor, fontSize: 11, fontWeight: FontWeight.bold)),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Booking #${r.bookingId.substring(0, 8)}',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: statusColor.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        r.status.toUpperCase(),
+                        style: TextStyle(
+                          color: statusColor,
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ]),
-              const SizedBox(height: 8),
-              Text('Amount: \$${r.amount.toStringAsFixed(2)}'),
-              Text('Reason: ${r.reason}', style: const TextStyle(color: Colors.grey)),
-              if (r.status == 'pending') ...[
-                const SizedBox(height: 12),
-                Row(children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () => _update(r.id, 'rejected'),
-                      icon: const Icon(Icons.close, color: Colors.red),
-                      label: const Text('Reject', style: TextStyle(color: Colors.red)),
-                    ),
+                const SizedBox(height: 8),
+                Text('Amount: \$${r.amount.toStringAsFixed(2)}'),
+                Text(
+                  'Reason: ${r.reason}',
+                  style: const TextStyle(color: Colors.grey),
+                ),
+                if (r.status == 'pending') ...[
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () => _update(r.id, 'rejected'),
+                          icon: const Icon(Icons.close, color: Colors.red),
+                          label: const Text(
+                            'Reject',
+                            style: TextStyle(color: Colors.red),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: FilledButton.icon(
+                          onPressed: () => _update(r.id, 'approved'),
+                          icon: const Icon(Icons.check),
+                          label: const Text('Approve'),
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: FilledButton.icon(
-                      onPressed: () => _update(r.id, 'approved'),
-                      icon: const Icon(Icons.check),
-                      label: const Text('Approve'),
-                    ),
-                  ),
-                ]),
+                ],
               ],
-            ]),
+            ),
           ),
         );
       },

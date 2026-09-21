@@ -37,7 +37,9 @@ class _AdminUsersViewState extends ConsumerState<AdminUsersView> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Updated ${user.name ?? user.email} to ${newRole.name.toUpperCase()}'),
+            content: Text(
+              'Updated ${user.name ?? user.email} to ${newRole.name.toUpperCase()}',
+            ),
             backgroundColor: Colors.green,
           ),
         );
@@ -47,9 +49,8 @@ class _AdminUsersViewState extends ConsumerState<AdminUsersView> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error updating role: $e')),
-        );
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Error updating role: $e')));
       }
     }
   }
@@ -67,7 +68,9 @@ class _AdminUsersViewState extends ConsumerState<AdminUsersView> {
               return ListTile(
                 title: Text(role.name.toUpperCase()),
                 leading: Icon(
-                  isSelected ? Icons.check_circle : Icons.radio_button_unchecked,
+                  isSelected
+                      ? Icons.check_circle
+                      : Icons.radio_button_unchecked,
                   color: isSelected ? Colors.blue : Colors.grey,
                 ),
                 onTap: () {
@@ -121,8 +124,13 @@ class _AdminUsersViewState extends ConsumerState<AdminUsersView> {
                       },
                     )
                   : null,
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 12,
+              ),
             ),
             onChanged: (val) {
               setState(() => _searchQuery = val.toLowerCase().trim());
@@ -137,7 +145,9 @@ class _AdminUsersViewState extends ConsumerState<AdminUsersView> {
                 return const Center(child: CircularProgressIndicator());
               }
               if (snapshot.hasError) {
-                return Center(child: Text('Error loading users: ${snapshot.error}'));
+                return Center(
+                  child: Text('Error loading users: ${snapshot.error}'),
+                );
               }
 
               var users = snapshot.data ?? [];
@@ -145,7 +155,8 @@ class _AdminUsersViewState extends ConsumerState<AdminUsersView> {
                 users = users.where((u) {
                   final name = u.name?.toLowerCase() ?? '';
                   final email = u.email.toLowerCase();
-                  return name.contains(_searchQuery) || email.contains(_searchQuery);
+                  return name.contains(_searchQuery) ||
+                      email.contains(_searchQuery);
                 }).toList();
               }
 
@@ -160,7 +171,10 @@ class _AdminUsersViewState extends ConsumerState<AdminUsersView> {
                   });
                 },
                 child: ListView.separated(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   itemCount: users.length,
                   separatorBuilder: (_, _) => const Divider(height: 1),
                   itemBuilder: (context, index) {
@@ -168,24 +182,41 @@ class _AdminUsersViewState extends ConsumerState<AdminUsersView> {
                     final roleColor = _getRoleColor(user.role);
 
                     return ListTile(
-                      contentPadding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                      contentPadding: const EdgeInsets.symmetric(
+                        vertical: 4,
+                        horizontal: 8,
+                      ),
                       leading: CircleAvatar(
                         backgroundColor: roleColor.withValues(alpha: 0.15),
                         child: Text(
-                          (user.name?.isNotEmpty == true ? user.name![0] : user.email[0]).toUpperCase(),
-                          style: TextStyle(color: roleColor, fontWeight: FontWeight.bold),
+                          (user.name?.isNotEmpty == true
+                                  ? user.name![0]
+                                  : user.email[0])
+                              .toUpperCase(),
+                          style: TextStyle(
+                            color: roleColor,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                       title: Text(
-                        user.name?.isNotEmpty == true ? user.name! : 'Unnamed User',
+                        user.name?.isNotEmpty == true
+                            ? user.name!
+                            : 'Unnamed User',
                         style: const TextStyle(fontWeight: FontWeight.w600),
                       ),
-                      subtitle: Text(user.email, style: const TextStyle(fontSize: 13)),
+                      subtitle: Text(
+                        user.email,
+                        style: const TextStyle(fontSize: 13),
+                      ),
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
                             decoration: BoxDecoration(
                               color: roleColor.withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(12),

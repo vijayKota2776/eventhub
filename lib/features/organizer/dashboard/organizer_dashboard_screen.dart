@@ -60,11 +60,16 @@ class _OrganizerDashboardScreenState
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.event_note,
-                            size: 64, color: colorScheme.outline),
+                        Icon(
+                          Icons.event_note,
+                          size: 64,
+                          color: colorScheme.outline,
+                        ),
                         const SizedBox(height: 16),
-                        const Text('No events created yet.',
-                            style: TextStyle(fontSize: 16)),
+                        const Text(
+                          'No events created yet.',
+                          style: TextStyle(fontSize: 16),
+                        ),
                         const SizedBox(height: 20),
                         FilledButton.icon(
                           icon: const Icon(Icons.add),
@@ -79,9 +84,13 @@ class _OrganizerDashboardScreenState
 
                 // Revenue summary
                 final totalRevenue = events.fold<double>(
-                    0, (sum, e) => sum + e.grossRevenue.toDouble());
-                final totalSold =
-                    events.fold<int>(0, (sum, e) => sum + e.totalSold);
+                  0,
+                  (sum, e) => sum + e.grossRevenue.toDouble(),
+                );
+                final totalSold = events.fold<int>(
+                  0,
+                  (sum, e) => sum + e.totalSold,
+                );
 
                 return RefreshIndicator(
                   onRefresh: () async => setState(() {}),
@@ -107,12 +116,10 @@ class _OrganizerDashboardScreenState
                           const SizedBox(width: 12),
                           _SummaryTile(
                             label: 'Revenue',
-                            value:
-                                '\$${totalRevenue.toStringAsFixed(0)}',
+                            value: '\$${totalRevenue.toStringAsFixed(0)}',
                             icon: Icons.attach_money,
                             color: Colors.green,
-                            onTap: () =>
-                                context.push('/organizer/payouts'),
+                            onTap: () => context.push('/organizer/payouts'),
                           ),
                         ],
                       ),
@@ -125,8 +132,8 @@ class _OrganizerDashboardScreenState
               },
             )
           : _currentIndex == 1
-              ? const ScannerScreen()
-              : const SizedBox(),
+          ? const ScannerScreen()
+          : const SizedBox(),
       floatingActionButton: _currentIndex == 0
           ? FloatingActionButton.extended(
               onPressed: () => context.push('/organizer/create_event'),
@@ -136,8 +143,7 @@ class _OrganizerDashboardScreenState
           : null,
       bottomNavigationBar: NavigationBar(
         selectedIndex: _currentIndex,
-        onDestinationSelected: (index) =>
-            setState(() => _currentIndex = index),
+        onDestinationSelected: (index) => setState(() => _currentIndex = index),
         destinations: const [
           NavigationDestination(
             icon: Icon(Icons.event_outlined),
@@ -188,14 +194,18 @@ class _SummaryTile extends StatelessWidget {
             children: [
               Icon(icon, color: color, size: 22),
               const SizedBox(height: 6),
-              Text(value,
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                      color: color)),
-              Text(label,
-                  style:
-                      const TextStyle(fontSize: 11, color: Colors.grey)),
+              Text(
+                value,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: color,
+                ),
+              ),
+              Text(
+                label,
+                style: const TextStyle(fontSize: 11, color: Colors.grey),
+              ),
             ],
           ),
         ),
@@ -226,10 +236,14 @@ class _EventTile extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ListTile(
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-            title: Text(event.title,
-                style: const TextStyle(fontWeight: FontWeight.bold)),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 4,
+            ),
+            title: Text(
+              event.title,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -238,7 +252,9 @@ class _EventTile extends StatelessWidget {
                   children: [
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 2),
+                        horizontal: 8,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: statusColor.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(6),
@@ -246,9 +262,10 @@ class _EventTile extends StatelessWidget {
                       child: Text(
                         event.status.toUpperCase(),
                         style: TextStyle(
-                            color: statusColor,
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold),
+                          color: statusColor,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -277,15 +294,15 @@ class _EventTile extends StatelessWidget {
                     icon: Icons.analytics_outlined,
                     label: 'Analytics',
                     color: Colors.blue,
-                    onTap: () => context
-                        .push('/organizer/event/${event.id}/analytics'),
+                    onTap: () =>
+                        context.push('/organizer/event/${event.id}/analytics'),
                   ),
                   _ActionBtn(
                     icon: Icons.people_outlined,
                     label: 'Attendees',
                     color: Colors.orange,
-                    onTap: () => context
-                        .push('/organizer/event/${event.id}/attendees'),
+                    onTap: () =>
+                        context.push('/organizer/event/${event.id}/attendees'),
                   ),
                   _ActionBtn(
                     icon: Icons.local_offer_outlined,
@@ -298,8 +315,8 @@ class _EventTile extends StatelessWidget {
                     icon: Icons.confirmation_number_outlined,
                     label: 'Tiers',
                     color: Colors.teal,
-                    onTap: () => context
-                        .push('/organizer/event/${event.id}/tickets'),
+                    onTap: () =>
+                        context.push('/organizer/event/${event.id}/tickets'),
                   ),
                 ],
               ),
@@ -328,10 +345,11 @@ class _ActionBtn extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextButton.icon(
       icon: Icon(icon, size: 16, color: color),
-      label: Text(label,
-          style: TextStyle(fontSize: 12, color: color)),
+      label: Text(label, style: TextStyle(fontSize: 12, color: color)),
       onPressed: onTap,
-      style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 10)),
+      style: TextButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+      ),
     );
   }
 }

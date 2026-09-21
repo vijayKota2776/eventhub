@@ -9,7 +9,8 @@ class AdminDashboardScreen extends ConsumerStatefulWidget {
   const AdminDashboardScreen({super.key});
 
   @override
-  ConsumerState<AdminDashboardScreen> createState() => _AdminDashboardScreenState();
+  ConsumerState<AdminDashboardScreen> createState() =>
+      _AdminDashboardScreenState();
 }
 
 class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
@@ -40,7 +41,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
             onPressed: () {
               ref.read(authControllerProvider.notifier).signOut();
             },
-          )
+          ),
         ],
       ),
       body: IndexedStack(

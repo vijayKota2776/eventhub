@@ -22,8 +22,10 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   bool _isLoading = false;
 
   // When seats are pre-selected, quantity is locked to number of seats
-  bool get _hasPreSelectedSeats => widget.selectedSeats != null && widget.selectedSeats!.isNotEmpty;
-  int get _effectiveQuantity => _hasPreSelectedSeats ? widget.selectedSeats!.length : _quantity;
+  bool get _hasPreSelectedSeats =>
+      widget.selectedSeats != null && widget.selectedSeats!.isNotEmpty;
+  int get _effectiveQuantity =>
+      _hasPreSelectedSeats ? widget.selectedSeats!.length : _quantity;
 
   final _promoController = TextEditingController();
   bool _isValidatingPromo = false;
@@ -48,7 +50,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     });
 
     try {
-      final promoData = await ref.read(bookingRepositoryProvider).validatePromoCode(widget.eventId, code);
+      final promoData = await ref
+          .read(bookingRepositoryProvider)
+          .validatePromoCode(widget.eventId, code);
       if (!mounted) return;
 
       if (promoData == null) {
@@ -61,11 +65,16 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       } else {
         setState(() {
           _appliedPromoCode = code;
-          _discountAmount = promoData['discount_amount'] != null ? double.parse(promoData['discount_amount'].toString()) : null;
-          _discountPercent = promoData['discount_percent'] != null ? double.parse(promoData['discount_percent'].toString()) : null;
+          _discountAmount = promoData['discount_amount'] != null
+              ? double.parse(promoData['discount_amount'].toString())
+              : null;
+          _discountPercent = promoData['discount_percent'] != null
+              ? double.parse(promoData['discount_percent'].toString())
+              : null;
           _promoError = null;
         });
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Promo code applied!')));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text('Promo code applied!')));
       }
     } catch (e) {
       if (mounted) setState(() => _promoError = 'Error validating promo code');
@@ -129,12 +138,14 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
     try {
       final user = ref.read(authControllerProvider).value!;
-      await ref.read(bookingRepositoryProvider).bookTicket(
-        ticketTypeId: _selectedTier!.id,
-        quantity: _effectiveQuantity,
-        userId: user.id,
-        promoCode: _appliedPromoCode,
-      );
+      await ref
+          .read(bookingRepositoryProvider)
+          .bookTicket(
+            ticketTypeId: _selectedTier!.id,
+            quantity: _effectiveQuantity,
+            userId: user.id,
+            promoCode: _appliedPromoCode,
+          );
 
       if (mounted) {
         showDialog(
@@ -152,9 +163,14 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Transaction: $txnId', style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                Text(
+                  'Transaction: $txnId',
+                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                ),
                 const SizedBox(height: 12),
-                Text('You have booked $_quantity x ${_selectedTier!.name}. Your QR ticket is ready in your wallet.'),
+                Text(
+                  'You have booked $_quantity x ${_selectedTier!.name}. Your QR ticket is ready in your wallet.',
+                ),
               ],
             ),
             actions: [
@@ -187,7 +203,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('Checkout')),
       body: FutureBuilder<List<TicketType>>(
-        future: ref.read(eventRepositoryProvider).getTicketTypes(widget.eventId),
+        future: ref
+            .read(eventRepositoryProvider)
+            .getTicketTypes(widget.eventId),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -198,7 +216,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
           final tickets = snapshot.data ?? [];
           if (tickets.isEmpty) {
-            return const Center(child: Text('No tickets available for this event.'));
+            return const Center(
+              child: Text('No tickets available for this event.'),
+            );
           }
 
           return ListView(
@@ -218,10 +238,19 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                     children: [
                       Row(
                         children: [
-                          const Icon(Icons.event_seat, color: Colors.blue, size: 18),
+                          const Icon(
+                            Icons.event_seat,
+                            color: Colors.blue,
+                            size: 18,
+                          ),
                           const SizedBox(width: 6),
-                          Text('Your Selected Seats (${widget.selectedSeats!.length})',
-                              style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.blue)),
+                          Text(
+                            'Your Selected Seats (${widget.selectedSeats!.length})',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.blue,
+                            ),
+                          ),
                         ],
                       ),
                       const SizedBox(height: 8),
@@ -231,25 +260,40 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                         children: widget.selectedSeats!.map((seat) {
                           final row = seat[0];
                           Color chipColor = Colors.grey.shade700;
-                          if (row == 'A' || row == 'B') chipColor = Colors.amber.shade700;
-                          if (row == 'C' || row == 'D') chipColor = Colors.purple;
+                          if (row == 'A' || row == 'B')
+                            chipColor = Colors.amber.shade700;
+                          if (row == 'C' || row == 'D')
+                            chipColor = Colors.purple;
                           return Chip(
-                            label: Text(seat, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+                            label: Text(
+                              seat,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                             backgroundColor: chipColor,
                             padding: EdgeInsets.zero,
-                            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            materialTapTargetSize:
+                                MaterialTapTargetSize.shrinkWrap,
                           );
                         }).toList(),
                       ),
                       const SizedBox(height: 4),
-                      const Text('Quantity is locked to your seat count.',
-                          style: TextStyle(fontSize: 11, color: Colors.grey)),
+                      const Text(
+                        'Quantity is locked to your seat count.',
+                        style: TextStyle(fontSize: 11, color: Colors.grey),
+                      ),
                     ],
                   ),
                 ),
                 const SizedBox(height: 16),
               ],
-              Text('Select Ticket Tier', style: Theme.of(context).textTheme.titleLarge),
+              Text(
+                'Select Ticket Tier',
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
               const SizedBox(height: 16),
               ...tickets.map((t) {
                 final remaining = t.quantityTotal - t.quantitySold;
@@ -261,25 +305,37 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                     side: BorderSide(
-                      color: isSelected ? Theme.of(context).colorScheme.primary : Colors.transparent,
+                      color: isSelected
+                          ? Theme.of(context).colorScheme.primary
+                          : Colors.transparent,
                       width: 2,
                     ),
                   ),
                   child: ListTile(
-                    title: Text(t.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-                    subtitle: Text('\$${t.price.toStringAsFixed(2)} • ${isAvailable ? '$remaining remaining' : 'Sold Out'}'),
-                    trailing: isSelected 
-                        ? const Icon(Icons.check_circle, color: Colors.blue) 
-                        : isAvailable 
-                            ? const Icon(Icons.radio_button_unchecked, color: Colors.grey)
-                            : null,
+                    title: Text(
+                      t.name,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    subtitle: Text(
+                      '\$${t.price.toStringAsFixed(2)} • ${isAvailable ? '$remaining remaining' : 'Sold Out'}',
+                    ),
+                    trailing: isSelected
+                        ? const Icon(Icons.check_circle, color: Colors.blue)
+                        : isAvailable
+                        ? const Icon(
+                            Icons.radio_button_unchecked,
+                            color: Colors.grey,
+                          )
+                        : null,
                     enabled: isAvailable,
-                    onTap: isAvailable ? () {
-                      setState(() {
-                        _selectedTier = t;
-                        _quantity = 1;
-                      });
-                    } : null,
+                    onTap: isAvailable
+                        ? () {
+                            setState(() {
+                              _selectedTier = t;
+                              _quantity = 1;
+                            });
+                          }
+                        : null,
                   ),
                 );
               }),
@@ -289,23 +345,42 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                 if (!_hasPreSelectedSeats)
                   Card(
                     elevation: 1,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                     child: Padding(
                       padding: const EdgeInsets.all(16),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text('Ticket Quantity:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                          const Text(
+                            'Ticket Quantity:',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                           Row(
                             children: [
                               IconButton(
                                 icon: const Icon(Icons.remove_circle_outline),
-                                onPressed: _quantity > 1 ? () => setState(() => _quantity--) : null,
+                                onPressed: _quantity > 1
+                                    ? () => setState(() => _quantity--)
+                                    : null,
                               ),
-                              Text('$_quantity', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                              Text(
+                                '$_quantity',
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                               IconButton(
                                 icon: const Icon(Icons.add_circle_outline),
-                                onPressed: _quantity < (_selectedTier!.quantityTotal - _selectedTier!.quantitySold)
+                                onPressed:
+                                    _quantity <
+                                        (_selectedTier!.quantityTotal -
+                                            _selectedTier!.quantitySold)
                                     ? () => setState(() => _quantity++)
                                     : null,
                               ),
@@ -317,7 +392,10 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                   ),
 
                 const SizedBox(height: 20),
-                const Text('Promo Code', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                const Text(
+                  'Promo Code',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
                 const SizedBox(height: 8),
                 Row(
                   children: [
@@ -326,7 +404,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                         controller: _promoController,
                         decoration: InputDecoration(
                           hintText: 'Enter promo code (e.g. VIP50)',
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                           errorText: _promoError,
                         ),
                       ),
@@ -335,10 +415,17 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                     ElevatedButton(
                       onPressed: _isValidatingPromo ? null : _validatePromo,
                       style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 16,
+                        ),
                       ),
-                      child: _isValidatingPromo 
-                          ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)) 
+                      child: _isValidatingPromo
+                          ? const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
                           : const Text('Apply'),
                     ),
                   ],
@@ -348,9 +435,19 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                     padding: const EdgeInsets.only(top: 8.0),
                     child: Row(
                       children: [
-                        const Icon(Icons.check_circle, color: Colors.green, size: 16),
+                        const Icon(
+                          Icons.check_circle,
+                          color: Colors.green,
+                          size: 16,
+                        ),
                         const SizedBox(width: 4),
-                        Text('Applied: $_appliedPromoCode', style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
+                        Text(
+                          'Applied: $_appliedPromoCode',
+                          style: const TextStyle(
+                            color: Colors.green,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -363,8 +460,13 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text('Subtotal:', style: TextStyle(fontSize: 16)),
-                    Text(CurrencyHelper.format(_selectedTier!.price * _effectiveQuantity, currency),
-                        style: const TextStyle(fontSize: 16)),
+                    Text(
+                      CurrencyHelper.format(
+                        _selectedTier!.price * _effectiveQuantity,
+                        currency,
+                      ),
+                      style: const TextStyle(fontSize: 16),
+                    ),
                   ],
                 ),
                 if (_appliedPromoCode != null) ...[
@@ -372,9 +474,18 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text('Promo Discount:', style: TextStyle(fontSize: 16, color: Colors.green)),
-                      Text('-${CurrencyHelper.format(_discountTotal, currency)}',
-                          style: const TextStyle(fontSize: 16, color: Colors.green, fontWeight: FontWeight.bold)),
+                      const Text(
+                        'Promo Discount:',
+                        style: TextStyle(fontSize: 16, color: Colors.green),
+                      ),
+                      Text(
+                        '-${CurrencyHelper.format(_discountTotal, currency)}',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Colors.green,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ],
                   ),
                 ],
@@ -382,9 +493,21 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('Total Amount:', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-                    Text(CurrencyHelper.format(_totalPrice, currency),
-                        style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.blue)),
+                    const Text(
+                      'Total Amount:',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      CurrencyHelper.format(_totalPrice, currency),
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue,
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 80),
@@ -397,17 +520,33 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: ElevatedButton.icon(
-            onPressed: (_selectedTier != null && !_isLoading) ? _openPaymentGateway : null,
-            icon: _isLoading ? const SizedBox() : const Icon(Icons.lock_outline),
+            onPressed: (_selectedTier != null && !_isLoading)
+                ? _openPaymentGateway
+                : null,
+            icon: _isLoading
+                ? const SizedBox()
+                : const Icon(Icons.lock_outline),
             label: _isLoading
-                ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
+                  )
                 : Text(
                     'Proceed to Pay ${CurrencyHelper.format(_totalPrice, ref.watch(currencyProvider))}',
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
             ),
           ),
         ),
@@ -446,16 +585,21 @@ class _PaymentGatewaySheetState extends State<_PaymentGatewaySheet> {
 
     await Future.delayed(const Duration(milliseconds: 900));
     if (!mounted) return;
-    setState(() => _processStatus = 'Authorizing payment via $_selectedMethod...');
+    setState(
+      () => _processStatus = 'Authorizing payment via $_selectedMethod...',
+    );
 
     await Future.delayed(const Duration(milliseconds: 1000));
     if (!mounted) return;
-    setState(() => _processStatus = 'Securing 256-bit encrypted confirmation...');
+    setState(
+      () => _processStatus = 'Securing 256-bit encrypted confirmation...',
+    );
 
     await Future.delayed(const Duration(milliseconds: 600));
     if (!mounted) return;
 
-    final txnId = 'TXN_${DateTime.now().millisecondsSinceEpoch.toString().substring(5)}';
+    final txnId =
+        'TXN_${DateTime.now().millisecondsSinceEpoch.toString().substring(5)}';
     await widget.onPaymentSuccess(_selectedMethod, txnId);
   }
 
@@ -476,14 +620,20 @@ class _PaymentGatewaySheetState extends State<_PaymentGatewaySheet> {
             child: Container(
               width: 40,
               height: 4,
-              decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(2)),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(2),
+              ),
             ),
           ),
           const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Secure Checkout', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+              const Text(
+                'Secure Checkout',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
@@ -494,7 +644,14 @@ class _PaymentGatewaySheetState extends State<_PaymentGatewaySheet> {
                   children: [
                     Icon(Icons.shield, color: Colors.green, size: 14),
                     SizedBox(width: 4),
-                    Text('256-bit SSL', style: TextStyle(color: Colors.green, fontSize: 11, fontWeight: FontWeight.bold)),
+                    Text(
+                      '256-bit SSL',
+                      style: TextStyle(
+                        color: Colors.green,
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -515,15 +672,27 @@ class _PaymentGatewaySheetState extends State<_PaymentGatewaySheet> {
                   children: [
                     const CircularProgressIndicator(),
                     const SizedBox(height: 20),
-                    Text(_processStatus, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
+                    Text(
+                      _processStatus,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 15,
+                      ),
+                    ),
                     const SizedBox(height: 6),
-                    const Text('Please do not press back or close the app', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                    const Text(
+                      'Please do not press back or close the app',
+                      style: TextStyle(color: Colors.grey, fontSize: 12),
+                    ),
                   ],
                 ),
               ),
             ),
           ] else ...[
-            const Text('Choose Payment Method', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+            const Text(
+              'Choose Payment Method',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+            ),
             const SizedBox(height: 12),
             _buildMethodTile(
               id: 'UPI',
@@ -548,12 +717,18 @@ class _PaymentGatewaySheetState extends State<_PaymentGatewaySheet> {
               onPressed: _handlePay,
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size(double.infinity, 52),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
                 backgroundColor: Colors.green.shade700,
               ),
               child: Text(
                 'Pay \$${widget.amount.toStringAsFixed(2)} Now',
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
               ),
             ),
           ],
@@ -574,13 +749,22 @@ class _PaymentGatewaySheetState extends State<_PaymentGatewaySheet> {
       margin: const EdgeInsets.only(bottom: 8),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: isSelected ? Colors.blue : Colors.grey.shade300),
+        side: BorderSide(
+          color: isSelected ? Colors.blue : Colors.grey.shade300,
+        ),
       ),
       child: ListTile(
         leading: Icon(icon, color: isSelected ? Colors.blue : Colors.grey),
-        title: Text(title, style: TextStyle(fontWeight: isSelected ? FontWeight.bold : FontWeight.normal)),
+        title: Text(
+          title,
+          style: TextStyle(
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          ),
+        ),
         subtitle: Text(subtitle, style: const TextStyle(fontSize: 12)),
-        trailing: isSelected ? const Icon(Icons.check_circle, color: Colors.blue) : null,
+        trailing: isSelected
+            ? const Icon(Icons.check_circle, color: Colors.blue)
+            : null,
         onTap: () => setState(() => _selectedMethod = id),
       ),
     );

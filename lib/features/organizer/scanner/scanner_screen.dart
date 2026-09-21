@@ -34,9 +34,13 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
     if (user == null) return;
 
     try {
-      final events = await ref.read(eventRepositoryProvider).getEventsByOrganizer(user.id);
+      final events = await ref
+          .read(eventRepositoryProvider)
+          .getEventsByOrganizer(user.id);
       for (final ev in events) {
-        final attendees = await ref.read(eventRepositoryProvider).getEventAttendees(ev.id);
+        final attendees = await ref
+            .read(eventRepositoryProvider)
+            .getEventAttendees(ev.id);
         for (final a in attendees) {
           if (a['id'] != null) {
             _cachedBookingIds.add(a['id'].toString());
@@ -80,7 +84,9 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
       setState(() => _isSyncing = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Synced $success check-ins to server! Remaining: ${_offlinePendingSync.length}'),
+          content: Text(
+            'Synced $success check-ins to server! Remaining: ${_offlinePendingSync.length}',
+          ),
           backgroundColor: Colors.green,
         ),
       );
@@ -117,7 +123,10 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
       if (_alreadyScannedIds.contains(bookingId)) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('⚠️ Ticket ALREADY Used!'), backgroundColor: Colors.orange),
+            const SnackBar(
+              content: Text('⚠️ Ticket ALREADY Used!'),
+              backgroundColor: Colors.orange,
+            ),
           );
         }
         await Future.delayed(const Duration(seconds: 2));
@@ -129,16 +138,24 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
 
       try {
         // 1. Try online check-in first
-        final status = await ref.read(bookingRepositoryProvider).checkInTicket(bookingId, user.id);
+        final status = await ref
+            .read(bookingRepositoryProvider)
+            .checkInTicket(bookingId, user.id);
         if (mounted) {
           if (status == 'OK') {
             _alreadyScannedIds.add(bookingId);
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('✅ Check-in Verified (Online)!'), backgroundColor: Colors.green),
+              const SnackBar(
+                content: Text('✅ Check-in Verified (Online)!'),
+                backgroundColor: Colors.green,
+              ),
             );
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('❌ Ticket Error: $status'), backgroundColor: Colors.red),
+              SnackBar(
+                content: Text('❌ Ticket Error: $status'),
+                backgroundColor: Colors.red,
+              ),
             );
           }
         }
@@ -150,7 +167,9 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('⚡ Verified (Offline Mode — Saved to sync queue)'),
+                content: Text(
+                  '⚡ Verified (Offline Mode — Saved to sync queue)',
+                ),
                 backgroundColor: Colors.teal,
               ),
             );
@@ -158,7 +177,10 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
         } else {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('❌ Ticket not found in local cache'), backgroundColor: Colors.red),
+              const SnackBar(
+                content: Text('❌ Ticket not found in local cache'),
+                backgroundColor: Colors.red,
+              ),
             );
           }
         }
@@ -166,7 +188,10 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error processing scan: $e'), backgroundColor: Colors.red),
+          SnackBar(
+            content: Text('Error processing scan: $e'),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     }
@@ -201,7 +226,9 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
           IconButton(
             icon: Icon(
               Icons.cloud_sync,
-              color: _offlinePendingSync.isNotEmpty ? Colors.amber : Colors.white,
+              color: _offlinePendingSync.isNotEmpty
+                  ? Colors.amber
+                  : Colors.white,
             ),
             tooltip: 'Sync Offline Queue (${_offlinePendingSync.length})',
             onPressed: _isSyncing ? null : _syncOfflineQueue,
@@ -210,11 +237,8 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
       ),
       body: Stack(
         children: [
-          MobileScanner(
-            controller: _scannerController,
-            onDetect: _handleScan,
-          ),
-          
+          MobileScanner(controller: _scannerController, onDetect: _handleScan),
+
           // Scanner Overlay Frame
           Center(
             child: Container(
@@ -243,22 +267,37 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
                 children: [
                   Row(
                     children: [
-                      const Icon(Icons.sd_storage, color: Colors.greenAccent, size: 16),
+                      const Icon(
+                        Icons.sd_storage,
+                        color: Colors.greenAccent,
+                        size: 16,
+                      ),
                       const SizedBox(width: 6),
                       Text(
                         'Cache: ${_cachedBookingIds.length} tickets',
-                        style: const TextStyle(color: Colors.white, fontSize: 12),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                        ),
                       ),
                     ],
                   ),
                   if (_offlinePendingSync.isNotEmpty)
                     Row(
                       children: [
-                        const Icon(Icons.sync_problem, color: Colors.amber, size: 16),
+                        const Icon(
+                          Icons.sync_problem,
+                          color: Colors.amber,
+                          size: 16,
+                        ),
                         const SizedBox(width: 4),
                         Text(
                           '${_offlinePendingSync.length} queued',
-                          style: const TextStyle(color: Colors.amber, fontSize: 12, fontWeight: FontWeight.bold),
+                          style: const TextStyle(
+                            color: Colors.amber,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ],
                     ),
@@ -278,7 +317,11 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
                     SizedBox(height: 16),
                     Text(
                       'Verifying Ticket QR...',
-                      style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ],
                 ),

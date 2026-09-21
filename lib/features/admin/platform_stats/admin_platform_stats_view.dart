@@ -6,10 +6,12 @@ class AdminPlatformStatsView extends ConsumerStatefulWidget {
   const AdminPlatformStatsView({super.key});
 
   @override
-  ConsumerState<AdminPlatformStatsView> createState() => _AdminPlatformStatsViewState();
+  ConsumerState<AdminPlatformStatsView> createState() =>
+      _AdminPlatformStatsViewState();
 }
 
-class _AdminPlatformStatsViewState extends ConsumerState<AdminPlatformStatsView> {
+class _AdminPlatformStatsViewState
+    extends ConsumerState<AdminPlatformStatsView> {
   late Future<Map<String, dynamic>> _statsFuture;
 
   @override
@@ -55,14 +57,17 @@ class _AdminPlatformStatsViewState extends ConsumerState<AdminPlatformStatsView>
             children: [
               Text(
                 'Platform Overview',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+                style: Theme.of(context).textTheme.headlineSmall
+                    ?.copyWith(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 16),
-              
+
               // Revenue Card
               Card(
                 elevation: 4,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
                 child: Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
@@ -81,9 +86,16 @@ class _AdminPlatformStatsViewState extends ConsumerState<AdminPlatformStatsView>
                         children: [
                           Text(
                             'Total Gross Revenue',
-                            style: TextStyle(color: Colors.white70, fontSize: 16),
+                            style: TextStyle(
+                              color: Colors.white70,
+                              fontSize: 16,
+                            ),
                           ),
-                          Icon(Icons.monetization_on_outlined, color: Colors.white, size: 28),
+                          Icon(
+                            Icons.monetization_on_outlined,
+                            color: Colors.white,
+                            size: 28,
+                          ),
                         ],
                       ),
                       const SizedBox(height: 12),
@@ -98,7 +110,10 @@ class _AdminPlatformStatsViewState extends ConsumerState<AdminPlatformStatsView>
                       const SizedBox(height: 6),
                       Text(
                         'Across $totalBookings total ticket bookings',
-                        style: const TextStyle(color: Colors.white70, fontSize: 14),
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 14,
+                        ),
                       ),
                     ],
                   ),
@@ -113,7 +128,8 @@ class _AdminPlatformStatsViewState extends ConsumerState<AdminPlatformStatsView>
                     child: _buildMetricCard(
                       title: 'Total Users',
                       value: '$totalUsers',
-                      subtitle: '$totalAttendees Attendees • $totalOrganizers Organizers',
+                      subtitle:
+                          '$totalAttendees Attendees • $totalOrganizers Organizers',
                       icon: Icons.people_outline,
                       color: Colors.blue,
                     ),
@@ -123,7 +139,8 @@ class _AdminPlatformStatsViewState extends ConsumerState<AdminPlatformStatsView>
                     child: _buildMetricCard(
                       title: 'Events',
                       value: '$totalEvents',
-                      subtitle: '$publishedEvents Live • $pendingEvents Pending',
+                      subtitle:
+                          '$publishedEvents Live • $pendingEvents Pending',
                       icon: Icons.event_available,
                       color: Colors.green,
                     ),
@@ -158,7 +175,9 @@ class _AdminPlatformStatsViewState extends ConsumerState<AdminPlatformStatsView>
               const SizedBox(height: 24),
               Card(
                 elevation: 2,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Column(
@@ -166,7 +185,10 @@ class _AdminPlatformStatsViewState extends ConsumerState<AdminPlatformStatsView>
                     children: [
                       const Text(
                         'Platform Status & Security',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       const SizedBox(height: 12),
                       _buildSecurityItem(
@@ -215,12 +237,18 @@ class _AdminPlatformStatsViewState extends ConsumerState<AdminPlatformStatsView>
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(title, style: const TextStyle(fontSize: 14, color: Colors.grey)),
+                Text(
+                  title,
+                  style: const TextStyle(fontSize: 14, color: Colors.grey),
+                ),
                 Icon(icon, color: color, size: 22),
               ],
             ),
             const SizedBox(height: 8),
-            Text(value, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+            Text(
+              value,
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 4),
             Text(
               subtitle,
@@ -247,7 +275,10 @@ class _AdminPlatformStatsViewState extends ConsumerState<AdminPlatformStatsView>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
-              Text(status, style: const TextStyle(color: Colors.grey, fontSize: 12)),
+              Text(
+                status,
+                style: const TextStyle(color: Colors.grey, fontSize: 12),
+              ),
             ],
           ),
         ),

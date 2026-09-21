@@ -21,15 +21,17 @@ class AuthController extends _$AuthController {
           role: user.userMetadata?['role'] == 'organizer'
               ? UserRole.organizer
               : user.userMetadata?['role'] == 'admin'
-                  ? UserRole.admin
-                  : UserRole.attendee,
+              ? UserRole.admin
+              : UserRole.attendee,
         );
   }
 
   Future<void> signIn(String email, String password) async {
     state = const AsyncValue.loading();
     try {
-      await ref.read(authRepositoryProvider).signIn(email: email, password: password);
+      await ref
+          .read(authRepositoryProvider)
+          .signIn(email: email, password: password);
       ref.invalidateSelf();
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -38,15 +40,16 @@ class AuthController extends _$AuthController {
   }
 
   Future<void> signUp(
-      String email, String password, String name, UserRole role) async {
+    String email,
+    String password,
+    String name,
+    UserRole role,
+  ) async {
     state = const AsyncValue.loading();
     try {
-      await ref.read(authRepositoryProvider).signUp(
-            email: email,
-            password: password,
-            name: name,
-            role: role,
-          );
+      await ref
+          .read(authRepositoryProvider)
+          .signUp(email: email, password: password, name: name, role: role);
       ref.invalidateSelf();
     } catch (e, st) {
       state = AsyncValue.error(e, st);

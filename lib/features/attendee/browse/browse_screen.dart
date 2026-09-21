@@ -103,15 +103,15 @@ class _BrowseScreenState extends ConsumerState<BrowseScreen> {
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [
-                      colorScheme.primary,
-                      colorScheme.primaryContainer,
-                    ],
+                    colors: [colorScheme.primary, colorScheme.primaryContainer],
                   ),
                 ),
                 child: SafeArea(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 12,
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -134,8 +134,9 @@ class _BrowseScreenState extends ConsumerState<BrowseScreen> {
                                   Text(
                                     'Discover your next experience',
                                     style: TextStyle(
-                                      color: colorScheme.onPrimary
-                                          .withValues(alpha: 0.8),
+                                      color: colorScheme.onPrimary.withValues(
+                                        alpha: 0.8,
+                                      ),
                                       fontSize: 13,
                                     ),
                                   ),
@@ -143,23 +144,32 @@ class _BrowseScreenState extends ConsumerState<BrowseScreen> {
                               ),
                             ),
                             IconButton(
-                              icon: Icon(Icons.notifications_outlined,
-                                  color: colorScheme.onPrimary),
-                              onPressed: () =>
-                                  context.push('/attendee/notification_settings'),
+                              icon: Icon(
+                                Icons.notifications_outlined,
+                                color: colorScheme.onPrimary,
+                              ),
+                              onPressed: () => context.push(
+                                '/attendee/notification_settings',
+                              ),
                               tooltip: 'Notifications',
                             ),
                             IconButton(
-                              icon: Icon(Icons.confirmation_number,
-                                  color: colorScheme.onPrimary),
+                              icon: Icon(
+                                Icons.confirmation_number,
+                                color: colorScheme.onPrimary,
+                              ),
                               onPressed: () =>
                                   context.push('/attendee/my_tickets'),
                               tooltip: 'My Tickets',
                             ),
                             IconButton(
-                              icon: Icon(Icons.logout, color: colorScheme.onPrimary),
-                              onPressed: () =>
-                                  ref.read(authControllerProvider.notifier).signOut(),
+                              icon: Icon(
+                                Icons.logout,
+                                color: colorScheme.onPrimary,
+                              ),
+                              onPressed: () => ref
+                                  .read(authControllerProvider.notifier)
+                                  .signOut(),
                             ),
                           ],
                         ),
@@ -191,7 +201,9 @@ class _BrowseScreenState extends ConsumerState<BrowseScreen> {
                                   }),
                                 )
                               : null,
-                          contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 0,
+                          ),
                           isDense: true,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -200,7 +212,8 @@ class _BrowseScreenState extends ConsumerState<BrowseScreen> {
                           filled: true,
                           fillColor: colorScheme.surfaceContainerHighest,
                         ),
-                        onChanged: (v) => setState(() => _searchQuery = v.trim()),
+                        onChanged: (v) =>
+                            setState(() => _searchQuery = v.trim()),
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -208,7 +221,9 @@ class _BrowseScreenState extends ConsumerState<BrowseScreen> {
                       isLabelVisible: _hasActiveFilters,
                       child: IconButton(
                         icon: Icon(
-                          _showFilters ? Icons.filter_list_off : Icons.filter_list,
+                          _showFilters
+                              ? Icons.filter_list_off
+                              : Icons.filter_list,
                           color: _hasActiveFilters
                               ? colorScheme.primary
                               : colorScheme.onSurface,
@@ -230,8 +245,7 @@ class _BrowseScreenState extends ConsumerState<BrowseScreen> {
               child: _FilterPanel(
                 selectedCategory: _selectedCategory,
                 fromDate: _fromDate,
-                onCategoryChanged: (c) =>
-                    setState(() => _selectedCategory = c),
+                onCategoryChanged: (c) => setState(() => _selectedCategory = c),
                 onDateChanged: (d) => setState(() => _fromDate = d),
                 onReset: _resetFilters,
               ),
@@ -242,7 +256,10 @@ class _BrowseScreenState extends ConsumerState<BrowseScreen> {
             child: SizedBox(
               height: 48,
               child: ListView.separated(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 scrollDirection: Axis.horizontal,
                 itemCount: _kCategories.length,
                 separatorBuilder: (_, _) => const SizedBox(width: 8),
@@ -253,8 +270,7 @@ class _BrowseScreenState extends ConsumerState<BrowseScreen> {
                     label: Text(cat),
                     selected: isSelected,
                     showCheckmark: false,
-                    onSelected: (_) =>
-                        setState(() => _selectedCategory = cat),
+                    onSelected: (_) => setState(() => _selectedCategory = cat),
                     backgroundColor: colorScheme.surfaceContainerHighest,
                     selectedColor: colorScheme.primaryContainer,
                     labelStyle: TextStyle(
@@ -276,16 +292,17 @@ class _BrowseScreenState extends ConsumerState<BrowseScreen> {
             loading: () => const SliverFillRemaining(
               child: Center(child: CircularProgressIndicator()),
             ),
-            error: (err, _) => SliverFillRemaining(
-              child: Center(child: Text('Error: $err')),
-            ),
+            error: (err, _) =>
+                SliverFillRemaining(child: Center(child: Text('Error: $err'))),
             data: (events) {
               final filtered = _applyLocalFilters(events);
 
               return SliverList(
                 delegate: SliverChildListDelegate([
                   // ── Recommendations Section ──────────────────────
-                  if (user != null && _selectedCategory == 'All' && _searchQuery.isEmpty)
+                  if (user != null &&
+                      _selectedCategory == 'All' &&
+                      _searchQuery.isEmpty)
                     _RecommendedSection(userId: user.id),
 
                   // ── All / Filtered Events ─────────────────────────
@@ -297,9 +314,7 @@ class _BrowseScreenState extends ConsumerState<BrowseScreen> {
                           _hasActiveFilters
                               ? '${filtered.length} result${filtered.length == 1 ? '' : 's'}'
                               : 'All Upcoming Events',
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleMedium
+                          style: Theme.of(context).textTheme.titleMedium
                               ?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         if (_hasActiveFilters) ...[
@@ -319,20 +334,30 @@ class _BrowseScreenState extends ConsumerState<BrowseScreen> {
                       child: Center(
                         child: Column(
                           children: [
-                            Icon(Icons.search_off, size: 48, color: Colors.grey),
+                            Icon(
+                              Icons.search_off,
+                              size: 48,
+                              color: Colors.grey,
+                            ),
                             SizedBox(height: 12),
-                            Text('No events match your filters.',
-                                style: TextStyle(color: Colors.grey)),
+                            Text(
+                              'No events match your filters.',
+                              style: TextStyle(color: Colors.grey),
+                            ),
                           ],
                         ),
                       ),
                     )
                   else
-                    ...filtered.map((e) => Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 8),
-                          child: _EventCard(event: e),
-                        )),
+                    ...filtered.map(
+                      (e) => Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        child: _EventCard(event: e),
+                      ),
+                    ),
                   const SizedBox(height: 80),
                 ]),
               );
@@ -380,11 +405,11 @@ class _FilterPanel extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Filters',
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleSmall
-                      ?.copyWith(fontWeight: FontWeight.bold)),
+              Text(
+                'Filters',
+                style: Theme.of(context).textTheme.titleSmall
+                    ?.copyWith(fontWeight: FontWeight.bold),
+              ),
               TextButton.icon(
                 icon: const Icon(Icons.restart_alt, size: 14),
                 label: const Text('Reset All'),
@@ -408,12 +433,18 @@ class _FilterPanel extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               decoration: BoxDecoration(
-                border: Border.all(color: colorScheme.outline.withValues(alpha: 0.5)),
+                border: Border.all(
+                  color: colorScheme.outline.withValues(alpha: 0.5),
+                ),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
                 children: [
-                  Icon(Icons.calendar_today, size: 16, color: colorScheme.primary),
+                  Icon(
+                    Icons.calendar_today,
+                    size: 16,
+                    color: colorScheme.primary,
+                  ),
                   const SizedBox(width: 8),
                   Text(
                     fromDate != null
@@ -466,7 +497,10 @@ class _RecommendedSection extends ConsumerWidget {
               child: Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 3,
+                    ),
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
                         colors: [Color(0xFF6C63FF), Color(0xFFE040FB)],
@@ -477,20 +511,21 @@ class _RecommendedSection extends ConsumerWidget {
                       children: [
                         Icon(Icons.auto_awesome, size: 14, color: Colors.white),
                         SizedBox(width: 4),
-                        Text('Recommended',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold)),
+                        Text(
+                          'Recommended',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ],
                     ),
                   ),
                   const SizedBox(width: 8),
                   Text(
                     'For You',
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleMedium
+                    style: Theme.of(context).textTheme.titleMedium
                         ?.copyWith(fontWeight: FontWeight.bold),
                   ),
                 ],
@@ -545,14 +580,17 @@ class _RecommendedCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(16),
+              ),
               child: AspectRatio(
                 aspectRatio: 16 / 9,
                 child: event.bannerUrl != null && event.bannerUrl!.isNotEmpty
-                    ? Image.network(event.bannerUrl!,
+                    ? Image.network(
+                        event.bannerUrl!,
                         fit: BoxFit.cover,
-                        errorBuilder: (_, _, _) =>
-                            _placeholder(colorScheme))
+                        errorBuilder: (_, _, _) => _placeholder(colorScheme),
+                      )
                     : _placeholder(colorScheme),
               ),
             ),
@@ -576,18 +614,26 @@ class _RecommendedCard extends StatelessWidget {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 13),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      Icon(Icons.location_on,
-                          size: 11, color: colorScheme.onSurfaceVariant),
+                      Icon(
+                        Icons.location_on,
+                        size: 11,
+                        color: colorScheme.onSurfaceVariant,
+                      ),
                       const SizedBox(width: 2),
-                      Text(event.city,
-                          style: TextStyle(
-                              fontSize: 11,
-                              color: colorScheme.onSurfaceVariant)),
+                      Text(
+                        event.city,
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                      ),
                     ],
                   ),
                 ],
@@ -600,9 +646,9 @@ class _RecommendedCard extends StatelessWidget {
   }
 
   Widget _placeholder(ColorScheme c) => Container(
-        color: c.secondaryContainer,
-        child: Icon(Icons.event, size: 36, color: c.onSecondaryContainer),
-      );
+    color: c.secondaryContainer,
+    child: Icon(Icons.event, size: 36, color: c.onSecondaryContainer),
+  );
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -646,7 +692,9 @@ class _EventCard extends StatelessWidget {
                     left: 10,
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 4),
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: colorScheme.primary.withValues(alpha: 0.9),
                         borderRadius: BorderRadius.circular(20),
@@ -671,7 +719,9 @@ class _EventCard extends StatelessWidget {
                       ),
                       child: Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.deepPurple.withValues(alpha: 0.85),
                           borderRadius: BorderRadius.circular(20),
@@ -681,11 +731,14 @@ class _EventCard extends StatelessWidget {
                           children: [
                             Icon(Icons.group, size: 12, color: Colors.white),
                             SizedBox(width: 4),
-                            Text('Group',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.bold)),
+                            Text(
+                              'Group',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -702,9 +755,7 @@ class _EventCard extends StatelessWidget {
                 children: [
                   Text(
                     event.title,
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleMedium
+                    style: Theme.of(context).textTheme.titleMedium
                         ?.copyWith(fontWeight: FontWeight.bold),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -712,15 +763,19 @@ class _EventCard extends StatelessWidget {
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      Icon(Icons.calendar_today,
-                          size: 14, color: colorScheme.onSurfaceVariant),
+                      Icon(
+                        Icons.calendar_today,
+                        size: 14,
+                        color: colorScheme.onSurfaceVariant,
+                      ),
                       const SizedBox(width: 6),
                       Expanded(
                         child: Text(
                           dateFormat.format(event.startAt),
                           style: TextStyle(
-                              color: colorScheme.onSurfaceVariant,
-                              fontSize: 13),
+                            color: colorScheme.onSurfaceVariant,
+                            fontSize: 13,
+                          ),
                         ),
                       ),
                     ],
@@ -728,22 +783,28 @@ class _EventCard extends StatelessWidget {
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      Icon(Icons.location_on,
-                          size: 14, color: colorScheme.onSurfaceVariant),
+                      Icon(
+                        Icons.location_on,
+                        size: 14,
+                        color: colorScheme.onSurfaceVariant,
+                      ),
                       const SizedBox(width: 6),
                       Expanded(
                         child: Text(
                           '${event.venue}, ${event.city}',
                           style: TextStyle(
-                              color: colorScheme.onSurfaceVariant,
-                              fontSize: 13),
+                            color: colorScheme.onSurfaceVariant,
+                            fontSize: 13,
+                          ),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       if (event.totalSold > 0)
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 2),
+                            horizontal: 8,
+                            vertical: 2,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.orange.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(8),
@@ -751,9 +812,10 @@ class _EventCard extends StatelessWidget {
                           child: Text(
                             '🔥 ${event.totalSold} going',
                             style: const TextStyle(
-                                color: Colors.orange,
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold),
+                              color: Colors.orange,
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                     ],
@@ -768,7 +830,7 @@ class _EventCard extends StatelessWidget {
   }
 
   Widget _buildPlaceholder(ColorScheme c) => Container(
-        color: c.secondaryContainer,
-        child: Icon(Icons.event, size: 48, color: c.onSecondaryContainer),
-      );
+    color: c.secondaryContainer,
+    child: Icon(Icons.event, size: 48, color: c.onSecondaryContainer),
+  );
 }

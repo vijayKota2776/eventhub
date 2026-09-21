@@ -16,5 +16,6 @@ abstract class TicketType with _$TicketType {
     @JsonKey(name: 'sales_end') required DateTime salesEnd,
   }) = _TicketType;
 
-  factory TicketType.fromJson(Map<String, dynamic> json) => _$TicketTypeFromJson(json);
+  factory TicketType.fromJson(Map<String, dynamic> json) =>
+      _$TicketTypeFromJson(json);
 }

@@ -71,10 +71,12 @@ class _GroupBookingScreenState extends ConsumerState<GroupBookingScreen> {
       final currency = ref.read(currencyProvider);
 
       final attendeeList = _attendees
-          .map((a) => {
-                'name': a['name']!.text.trim(),
-                'email': a['email']!.text.trim(),
-              })
+          .map(
+            (a) => {
+              'name': a['name']!.text.trim(),
+              'email': a['email']!.text.trim(),
+            },
+          )
           .toList();
 
       final bookingIds = await ref
@@ -130,7 +132,9 @@ class _GroupBookingScreenState extends ConsumerState<GroupBookingScreen> {
         ],
       ),
       body: FutureBuilder<List<TicketType>>(
-        future: ref.read(eventRepositoryProvider).getTicketTypes(widget.eventId),
+        future: ref
+            .read(eventRepositoryProvider)
+            .getTicketTypes(widget.eventId),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -149,7 +153,8 @@ class _GroupBookingScreenState extends ConsumerState<GroupBookingScreen> {
                     color: Colors.deepPurple.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                        color: Colors.deepPurple.withValues(alpha: 0.3)),
+                      color: Colors.deepPurple.withValues(alpha: 0.3),
+                    ),
                   ),
                   child: const Row(
                     children: [
@@ -167,11 +172,11 @@ class _GroupBookingScreenState extends ConsumerState<GroupBookingScreen> {
                 const SizedBox(height: 20),
 
                 // ── Ticket Tier ──────────────────────────────────────
-                Text('Select Ticket Tier',
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleMedium
-                        ?.copyWith(fontWeight: FontWeight.bold)),
+                Text(
+                  'Select Ticket Tier',
+                  style: Theme.of(context).textTheme.titleMedium
+                      ?.copyWith(fontWeight: FontWeight.bold),
+                ),
                 const SizedBox(height: 10),
                 ...tiers.map((t) {
                   final remaining = t.quantityTotal - t.quantitySold;
@@ -190,18 +195,19 @@ class _GroupBookingScreenState extends ConsumerState<GroupBookingScreen> {
                       ),
                     ),
                     child: ListTile(
-                      title: Text(t.name,
-                          style:
-                              const TextStyle(fontWeight: FontWeight.bold)),
+                      title: Text(
+                        t.name,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
                       subtitle: Text(
                         '${CurrencyHelper.format(t.price, currency)} per person  •  $remaining available',
                         style: TextStyle(
-                            color: isAvailable ? null : Colors.red,
-                            fontSize: 12),
+                          color: isAvailable ? null : Colors.red,
+                          fontSize: 12,
+                        ),
                       ),
                       trailing: isSelected
-                          ? Icon(Icons.check_circle,
-                              color: colorScheme.primary)
+                          ? Icon(Icons.check_circle, color: colorScheme.primary)
                           : null,
                       enabled: isAvailable,
                       onTap: isAvailable
@@ -216,15 +222,16 @@ class _GroupBookingScreenState extends ConsumerState<GroupBookingScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Attendee Details',
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleMedium
-                            ?.copyWith(fontWeight: FontWeight.bold)),
+                    Text(
+                      'Attendee Details',
+                      style: Theme.of(context).textTheme.titleMedium
+                          ?.copyWith(fontWeight: FontWeight.bold),
+                    ),
                     FilledButton.tonalIcon(
                       icon: const Icon(Icons.person_add, size: 16),
                       label: const Text('Add'),
-                      onPressed: _selectedTier != null &&
+                      onPressed:
+                          _selectedTier != null &&
                               _attendees.length <
                                   (_selectedTier!.quantityTotal -
                                       _selectedTier!.quantitySold)
@@ -262,7 +269,9 @@ class _GroupBookingScreenState extends ConsumerState<GroupBookingScreen> {
                       Text(
                         CurrencyHelper.format(_totalPrice, currency),
                         style: const TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ],
                   ),
@@ -286,15 +295,22 @@ class _GroupBookingScreenState extends ConsumerState<GroupBookingScreen> {
                     width: 20,
                     height: 20,
                     child: CircularProgressIndicator(
-                        color: Colors.white, strokeWidth: 2))
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
+                  )
                 : Text(
                     'Book for ${_attendees.length} — ${CurrencyHelper.format(_totalPrice, ref.watch(currencyProvider))}',
-                    style: const TextStyle(fontWeight: FontWeight.bold)),
-            onPressed: (_selectedTier != null && !_isLoading) ? _bookGroup : null,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+            onPressed: (_selectedTier != null && !_isLoading)
+                ? _bookGroup
+                : null,
             style: FilledButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16)),
+                borderRadius: BorderRadius.circular(16),
+              ),
             ),
           ),
         ),
@@ -334,18 +350,27 @@ class _AttendeeCard extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 14,
-                  child: Text('${index + 1}',
-                      style: const TextStyle(
-                          fontSize: 12, fontWeight: FontWeight.bold)),
+                  child: Text(
+                    '${index + 1}',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
                 const SizedBox(width: 8),
-                Text('Attendee ${index + 1}',
-                    style: const TextStyle(fontWeight: FontWeight.bold)),
+                Text(
+                  'Attendee ${index + 1}',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
                 const Spacer(),
                 if (onRemove != null)
                   IconButton(
-                    icon: const Icon(Icons.remove_circle_outline,
-                        color: Colors.red, size: 20),
+                    icon: const Icon(
+                      Icons.remove_circle_outline,
+                      color: Colors.red,
+                      size: 20,
+                    ),
                     onPressed: onRemove,
                     tooltip: 'Remove attendee',
                     padding: EdgeInsets.zero,
@@ -360,7 +385,8 @@ class _AttendeeCard extends StatelessWidget {
                 labelText: 'Full Name',
                 prefixIcon: const Icon(Icons.person_outline, size: 18),
                 border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8)),
+                  borderRadius: BorderRadius.circular(8),
+                ),
                 isDense: true,
               ),
               validator: (v) =>
@@ -374,7 +400,8 @@ class _AttendeeCard extends StatelessWidget {
                 labelText: 'Email',
                 prefixIcon: const Icon(Icons.email_outlined, size: 18),
                 border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8)),
+                  borderRadius: BorderRadius.circular(8),
+                ),
                 isDense: true,
               ),
               validator: (v) => (v == null || !v.contains('@'))

@@ -48,12 +48,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     try {
       if (_isLogin) {
-        await ref.read(authControllerProvider.notifier).signIn(
-              email,
-              password,
-            );
+        await ref.read(authControllerProvider.notifier).signIn(email, password);
       } else {
-        await ref.read(authControllerProvider.notifier).signUp(
+        await ref
+            .read(authControllerProvider.notifier)
+            .signUp(
               email,
               password,
               _nameController.text.trim(),
@@ -69,11 +68,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               '⏱️ Supabase Email Rate Limit: You can only request 1 email per minute.\n'
               'If you already created an account, click "Already have an account? Sign in" below!';
         } else if (errStr.contains('Invalid login credentials')) {
-          _errorMessage =
-              '❌ Invalid email or password. Please check your credentials or register a new account.';
+          _errorMessage = '❌ Invalid email or password. Please check your credentials or register a new account.';
         } else if (errStr.contains('User already registered')) {
-          _errorMessage =
-              'ℹ️ This email is already registered! Switch to "Sign in" below to log in.';
+          _errorMessage = 'ℹ️ This email is already registered! Switch to "Sign in" below to log in.';
         } else {
           _errorMessage = errStr.replaceAll('Exception:', '').trim();
         }
@@ -114,8 +111,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.confirmation_number,
-                        size: 32, color: colorScheme.primary),
+                    Icon(
+                      Icons.confirmation_number,
+                      size: 32,
+                      color: colorScheme.primary,
+                    ),
                     const SizedBox(width: 10),
                     Text(
                       'EventHub',
@@ -130,10 +130,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  _isLogin ? 'Welcome Back — Sign In' : 'Join EventHub — Register',
+                  _isLogin
+                      ? 'Welcome Back — Sign In'
+                      : 'Join EventHub — Register',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                      fontSize: 14, color: colorScheme.onSurfaceVariant),
+                    fontSize: 14,
+                    color: colorScheme.onSurfaceVariant,
+                  ),
                 ),
                 const SizedBox(height: 28),
 
@@ -145,7 +149,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       labelText: 'Full Name',
                       prefixIcon: const Icon(Icons.person_outlined),
                       border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12)),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -158,7 +163,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     labelText: 'Email Address',
                     prefixIcon: const Icon(Icons.email_outlined),
                     border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12)),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                   keyboardType: TextInputType.emailAddress,
                 ),
@@ -171,7 +177,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     labelText: 'Password',
                     prefixIcon: const Icon(Icons.lock_outlined),
                     border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12)),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                   obscureText: true,
                 ),
@@ -185,7 +192,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       labelText: 'Account Type',
                       prefixIcon: const Icon(Icons.badge_outlined),
                       border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12)),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                     items: const [
                       DropdownMenuItem(
@@ -216,7 +224,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     child: Text(
                       _errorMessage!,
                       style: TextStyle(
-                          color: colorScheme.onErrorContainer, fontSize: 13),
+                        color: colorScheme.onErrorContainer,
+                        fontSize: 13,
+                      ),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -227,19 +237,24 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   style: FilledButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                   child: _isLoading
                       ? const SizedBox(
                           height: 20,
                           width: 20,
                           child: CircularProgressIndicator(
-                              color: Colors.white, strokeWidth: 2),
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
                         )
                       : Text(
                           _isLogin ? 'Sign In' : 'Create Account',
                           style: const TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.bold),
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                 ),
                 const SizedBox(height: 12),
@@ -252,9 +267,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       _errorMessage = null;
                     });
                   },
-                  child: Text(_isLogin
-                      ? "Don't have an account? Sign up"
-                      : "Already have an account? Sign in"),
+                  child: Text(
+                    _isLogin
+                        ? "Don't have an account? Sign up"
+                        : "Already have an account? Sign in",
+                  ),
                 ),
               ],
             ),

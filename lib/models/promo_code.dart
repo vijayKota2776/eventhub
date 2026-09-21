@@ -16,5 +16,6 @@ abstract class PromoCode with _$PromoCode {
     @JsonKey(name: 'valid_until') DateTime? validUntil,
   }) = _PromoCode;
 
-  factory PromoCode.fromJson(Map<String, dynamic> json) => _$PromoCodeFromJson(json);
+  factory PromoCode.fromJson(Map<String, dynamic> json) =>
+      _$PromoCodeFromJson(json);
 }

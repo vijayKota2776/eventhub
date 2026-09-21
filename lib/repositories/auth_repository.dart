@@ -41,10 +41,7 @@ class AuthRepository {
     final response = await _client.auth.signUp(
       email: email,
       password: password,
-      data: {
-        'name': name,
-        'role': role.name,
-      },
+      data: {'name': name, 'role': role.name},
     );
 
     if (response.user != null) {
@@ -72,10 +69,7 @@ class AuthRepository {
   }
 
   Future<void> updateUserRole(String userId, UserRole newRole) async {
-    await _client
-        .from('users')
-        .update({'role': newRole.name})
-        .eq('id', userId);
+    await _client.from('users').update({'role': newRole.name}).eq('id', userId);
   }
 }
 
